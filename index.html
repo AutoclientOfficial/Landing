@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITS Logic — Intelligent Technology Solutions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C87A;
+      --gold-pale: #F5E6C0;
+      --dark: #060810;
+      --dark-2: #0C1120;
+      --dark-3: #111827;
+      --accent: #1E3A8A;
+      --accent-2: #2563EB;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: #E2E8F0;
+      overflow-x: hidden;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+    /* ─── AURORA CANVAS ─── */
+    #aurora-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ─── GLASS ─── */
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(201, 168, 76, 0.12);
+    }
+
+    .glass-strong {
+      background: rgba(12, 17, 32, 0.7);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    /* ─── GRADIENT TEXT ─── */
+    .text-gold-gradient {
+      background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 40%, var(--gold-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .text-blue-gradient {
+      background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 50%, #818CF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── GOLD LINE ─── */
+    .gold-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* ─── GLOW ─── */
+    .glow-gold { box-shadow: 0 0 40px rgba(201, 168, 76, 0.2), 0 0 80px rgba(201, 168, 76, 0.08); }
+    .glow-blue { box-shadow: 0 0 40px rgba(37, 99, 235, 0.3), 0 0 80px rgba(37, 99, 235, 0.1); }
+    .text-glow { text-shadow: 0 0 40px rgba(201, 168, 76, 0.4); }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      transition: all 0.4s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(6, 8, 16, 0.92);
+      backdrop-filter: blur(30px);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+    }
+
+    .nav-link {
+      position: relative;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(226, 232, 240, 0.7);
+      transition: color 0.3s;
+      text-decoration: none;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover { color: var(--gold-light); }
+    .nav-link:hover::after { width: 100%; }
+
+    /* ─── HERO ─── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      background: rgba(201, 168, 76, 0.05);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+    }
+
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    /* ─── MARQUEE ─── */
+    .marquee-track {
+      display: flex;
+      gap: 60px;
+      animation: marquee 30s linear infinite;
+      white-space: nowrap;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .marquee-track:hover { animation-play-state: paused; }
+
+    /* ─── BUTTONS ─── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--gold) 0%, #B8922E 100%);
+      color: #06080E;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 48px rgba(201, 168, 76, 0.35); }
+    .btn-primary span { position: relative; z-index: 1; }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 32px;
+      background: transparent;
+      color: var(--gold-light);
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(201, 168, 76, 0.08);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    /* ─── SERVICE CARD ─── */
+    .service-card {
+      position: relative;
+      padding: 40px 36px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.4s ease;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .service-card:hover {
+      border-color: rgba(201, 168, 76, 0.35);
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,168,76,0.1);
+    }
+
+    .service-card:hover::before { opacity: 1; }
+
+    .service-icon {
+      width: 56px; height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+      border: 1px solid rgba(201,168,76,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 24px;
+    }
+
+    /* ─── STAT CARD ─── */
+    .stat-card {
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 5vw, 5rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    /* ─── PROCESS STEP ─── */
+    .process-step {
+      position: relative;
+      padding-left: 80px;
+    }
+
+    .step-number {
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    /* ─── TESTIMONIAL ─── */
+    .testimonial-card {
+      padding: 40px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.07);
+      transition: all 0.4s ease;
+    }
+
+    .testimonial-card:hover {
+      border-color: rgba(201,168,76,0.25);
+      background: rgba(201,168,76,0.03);
+    }
+
+    .stars { color: var(--gold); letter-spacing: 2px; }
+
+    /* ─── FLOATING ORBS ─── */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: float-orb 8s ease-in-out infinite;
+    }
+
+    @keyframes float-orb {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* ─── COUNTER ─── */
+    .counter { transition: all 0.1s; }
+
+    /* ─── REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ─── GRID LINES ─── */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ─── SECTION LABEL ─── */
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    /* ─── MOBILE MENU ─── */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: rgba(6,8,16,0.97);
+      backdrop-filter: blur(30px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    /* ─── FORM ─── */
+    .form-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #E2E8F0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-input:focus { border-color: rgba(201,168,76,0.5); }
+    .form-input::placeholder { color: rgba(226,232,240,0.3); }
+
+    textarea.form-input { resize: vertical; min-height: 120px; }
+
+    /* ─── FOOTER ─── */
+    footer a {
+      color: rgba(226,232,240,0.5);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.3s;
+    }
+    footer a:hover { color: var(--gold-light); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .desktop-nav { display: none; }
+    }
+
+    @media (min-width: 769px) {
+      .hamburger { display: none; }
+    }
+
+    /* ─── CURSOR ─── */
+    .cursor {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+      mix-blend-mode: difference;
+    }
+
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(201,168,76,0.5);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.4s ease, width 0.3s, height 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      .cursor, .cursor-ring { display: none; }
+    }
+
+    /* ─── TAG CHIP ─── */
+    .tag-chip {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.2);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--gold-light);
+      text-transform: uppercase;
+    }
+
+    /* scrolled logo */
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── FEATURE ROW ─── */
+    .feature-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .feature-row:last-child { border-bottom: none; }
+
+    .feature-check {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Aurora Background -->
+<canvas id="aurora-canvas"></canvas>
+
+<!-- ════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════ -->
+<nav id="navbar" class="py-5 px-6 md:px-12 lg:px-20">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-3 z-10">
+      <div class="relative">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center glow-gold">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#06080E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <span class="logo-text text-gold-gradient">ITS Logic</span>
+        <div style="font-size:0.55rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(201,168,76,0.5); line-height:1; margin-top:1px;">Intelligent Technology Solutions</div>
+      </div>
+    </a>
+
+    <!-- Desktop Nav -->
+    <div class="desktop-nav flex items-center gap-8">
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#process" class="nav-link">Process</a>
+      <a href="#clients" class="nav-link">Clients</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+
+    <div class="desktop-nav flex items-center gap-4">
+      <a href="#contact" class="btn-primary" style="padding:10px 24px; font-size:0.75rem;">
+        <span>Get Started</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <!-- Hamburger -->
+    <button class="hamburger z-[101]" id="menuBtn" aria-label="Menu" style="background:none;border:none;cursor:pointer;padding:8px;">
+      <div id="ham1" style="width:24px;height:2px;background:var(--gold-light);margin:5px 0;transition:all 0.3s;"></div>
+      <div id="ham2" style="width:16px;height:2px;background:var(--gold-light);margin:5px 0;transition:all 0.3s;"></div>
+      <div id="ham3" style="width:24px;height:2px;background:var(--gold-light);margin:5px 0;transition:all 0.3s;"></div>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#services" class="nav-link text-xl" onclick="closeMobile()">Services</a>
+  <a href="#about" class="nav-link text-xl" onclick="closeMobile()">About</a>
+  <a href="#process" class="nav-link text-xl" onclick="closeMobile()">Process</a>
+  <a href="#clients" class="nav-link text-xl" onclick="closeMobile()">Clients</a>
+  <a href="#contact" class="nav-link text-xl" onclick="closeMobile()">Contact</a>
+  <a href="#contact" class="btn-primary mt-4" onclick="closeMobile()"><span>Get Started</span></a>
+</div>
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section id="hero" class="relative z-10">
+  <!-- Floating orbs -->
+  <div class="orb" style="width:500px;height:500px;background:rgba(37,99,235,0.12);top:-100px;left:-200px;animation-delay:0s;"></div>
+  <div class="orb" style="width:400px;height:400px;background:rgba(201,168,76,0.08);bottom:0;right:-100px;animation-delay:3s;animation-duration:10s;"></div>
+
+  <div class="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pt-28 pb-20">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Left -->
+      <div>
+        <div class="hero-badge mb-8" id="heroBadge">
+          <span class="dot"></span>
+          Enterprise Technology Partner
+        </div>
+
+        <h1 id="heroTitle" style="font-family:'Playfair Display',serif; font-size:clamp(2.8rem,5.5vw,5rem); font-weight:700; line-height:1.08; letter-spacing:-0.02em; margin-bottom:28px;">
+          Where Logic <br/>
+          <em style="font-style:italic; color:transparent; -webkit-text-stroke:1px rgba(201,168,76,0.6);">Meets</em>
+          <span class="text-gold-gradient"> Innovation</span>
+        </h1>
+
+        <p id="heroSub" style="font-size:1.05rem; color:rgba(226,232,240,0.65); line-height:1.8; max-width:480px; margin-bottom:40px;">
+          ITS Logic delivers bespoke technology solutions that transform complex business challenges into competitive advantages. Precision-engineered for enterprises that demand excellence.
+        </p>
+
+        <div id="heroCta" class="flex flex-wrap gap-4 mb-16">
+          <a href="#contact" class="btn-primary">
+            <span>Start a Project</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#services" class="btn-ghost">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M10 8l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Explore Services</span>
+          </a>
+        </div>
+
+        <!-- Micro stats -->
+        <div id="heroStats" class="grid grid-cols-3 gap-6">
+          <div>
+            <div style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:700;" class="text-gold-gradient">200+</div>
+            <div style="font-size:0.75rem; color:rgba(226,232,240,0.45); letter-spacing:0.05em; margin-top:4px;">Projects Delivered</div>
+          </div>
+          <div style="border-left:1px solid rgba(255,255,255,0.06); padding-left:24px;">
+            <div style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:700;" class="text-gold-gradient">98%</div>
+            <div style="font-size:0.75rem; color:rgba(226,232,240,0.45); letter-spacing:0.05em; margin-top:4px;">Client Retention</div>
+          </div>
+          <div style="border-left:1px solid rgba(255,255,255,0.06); padding-left:24px;">
+            <div style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:700;" class="text-gold-gradient">12+</div>
+            <div style="font-size:0.75rem; color:rgba(226,232,240,0.45); letter-spacing:0.05em; margin-top:4px;">Years Experience</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right — Glowing card stack -->
+      <div class="relative hidden lg:flex items-center justify-center" id="heroVisual">
+        <!-- Main card -->
+        <div class="glass-strong rounded-2xl p-8 glow-gold" style="width:420px; position:relative; z-index:3;">
+          <div class="flex items-center justify-between mb-6">
+            <div class="section-label">Live Dashboard</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:rgba(201,168,76,0.5);">v4.2.1</div>
+          </div>
+
+          <!-- Mini metrics -->
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div style="background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.1); border-radius:10px; padding:16px;">
+              <div style="font-size:0.68rem; color:rgba(226,232,240,0.4); text-transform:uppercase; letter-spacing:0.1em;">Uptime</div>
+              <div style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--gold-light); margin-top:4px;">99.9%</div>
+            </div>
+            <div style="background:rgba(59,130,246,0.05); border:1px solid rgba(59,130,246,0.1); border-radius:10px; padding:16px;">
+              <div style="font-size:0.68rem; color:rgba(226,232,240,0.4); text-transform:uppercase; letter-spacing:0.1em;">Response</div>
+              <div style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:#60A5FA; margin-top:4px;">1.2ms</div>
+            </div>
+          </div>
+
+          <!-- Sparkline -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:0.72rem; color:rgba(226,232,240,0.4); margin-bottom:8px;">Performance Index — 30 days</div>
+            <svg viewBox="0 0 360 60" fill="none" style="width:100%;">
+              <defs>
+                <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(201,168,76,0.4)"/>
+                  <stop offset="100%" stop-color="rgba(201,168,76,0)"/>
+                </linearGradient>
+              </defs>
+              <path d="M0 45 L30 38 L60 42 L90 30 L120 35 L150 20 L180 25 L210 15 L240 18 L270 10 L300 12 L330 8 L360 5" stroke="var(--gold)" stroke-width="1.5" fill="none"/>
+              <path d="M0 45 L30 38 L60 42 L90 30 L120 35 L150 20 L180 25 L210 15 L240 18 L270 10 L300 12 L330 8 L360 5 L360 60 L0 60Z" fill="url(#sparkGrad)"/>
+            </svg>
+          </div>
+
+          <!-- Status pills -->
+          <div class="flex gap-2 flex-wrap">
+            <span class="tag-chip">✦ AI-Powered</span>
+            <span class="tag-chip">✦ Real-time</span>
+            <span class="tag-chip">✦ Enterprise</span>
+          </div>
+        </div>
+
+        <!-- Background cards -->
+        <div class="glass rounded-2xl" style="width:380px;height:80px;position:absolute;top:-30px;left:50%;transform:translateX(-50%);z-index:2;opacity:0.5;"></div>
+        <div class="glass rounded-2xl" style="width:340px;height:80px;position:absolute;top:-52px;left:50%;transform:translateX(-50%);z-index:1;opacity:0.25;"></div>
+
+        <!-- Floating badge -->
+        <div class="glass-strong rounded-full px-4 py-2 absolute" style="bottom:-20px;right:20px;z-index:4;display:flex;align-items:center;gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="var(--gold)" stroke="var(--gold)" stroke-width="1"/></svg>
+          <span style="font-size:0.72rem;font-weight:500;color:var(--gold-light);">ISO 27001 Certified</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0.4;">
+    <div style="font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);">Scroll</div>
+    <div style="width:1px;height:40px;background:linear-gradient(to bottom, var(--gold), transparent);"></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     MARQUEE — PARTNERS
+════════════════════════════════════════ -->
+<div class="relative z-10 py-6 overflow-hidden" style="border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);">
+  <div style="display:flex;overflow:hidden;mask-image:linear-gradient(90deg,transparent,black 10%,black 90%,transparent);">
+    <div class="marquee-track" id="marqueeTrack">
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Microsoft Azure</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Google Cloud</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">AWS Partner</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Salesforce</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">SAP Solutions</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Oracle Partner</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Cisco Systems</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">IBM Consulting</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <!-- Duplicate for seamless loop -->
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Microsoft Azure</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Google Cloud</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">AWS Partner</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Salesforce</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">SAP Solutions</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Oracle Partner</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">Cisco Systems</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+      <span style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(226,232,240,0.25);">IBM Consulting</span>
+      <span style="color:rgba(201,168,76,0.3);">✦</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SERVICES
+════════════════════════════════════════ -->
+<section id="services" class="relative z-10 py-28 px-6 md:px-12 lg:px-20">
+  <div class="max-w-7xl mx-auto">
+    <div class="reveal mb-4">
+      <div class="section-label">What We Offer</div>
+    </div>
+    <div class="reveal reveal-delay-1 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+      <h2 style="font-family:'Playfair Display',serif; font-size:clamp(2rem,3.5vw,3.2rem); font-weight:700; line-height:1.15; max-width:520px;">
+        Enterprise-Grade Services, <em style="font-style:italic;" class="text-gold-gradient">Delivered with Precision</em>
+      </h2>
+      <p style="max-width:340px; color:rgba(226,232,240,0.55); font-size:0.9rem; line-height:1.7;">
+        Every solution we architect is purpose-built for scale, security, and longevity — built to outlast trends.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Card 1 -->
+      <div class="service-card reveal">
+        <div class="service-icon">🏗️</div>
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:600; margin-bottom:12px;">Enterprise Architecture</h3>
+        <p style="color:rgba(226,232,240,0.5); font-size:0.875rem; line-height:1.75; margin-bottom:20px;">
+          We design robust, scalable architectures that form the backbone of your digital operations — cloud-native, resilient, and future-proof.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-chip">Microservices</span>
+          <span class="tag-chip">Cloud Native</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-icon">🤖</div>
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:600; margin-bottom:12px;">AI & Machine Learning</h3>
+        <p style="color:rgba(226,232,240,0.5); font-size:0.875rem; line-height:1.75; margin-bottom:20px;">
+          Custom AI models and intelligent automation systems that generate measurable ROI. Predictive analytics, NLP, and computer vision solutions.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-chip">Predictive AI</span>
+          <span class="tag-chip">Automation</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="service-card reveal reveal-delay-2">
+        <div class="service-icon">🔐</div>
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:600; margin-bottom:12px;">Cybersecurity</h3>
+        <p style="color:rgba(226,232,240,0.5); font-size:0.875rem; line-height:1.75; margin-bottom:20px;">
+          Comprehensive security frameworks — from threat intelligence and penetration testing to zero-trust architecture and compliance assurance.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-chip">Zero Trust</span>
+          <span class="tag-chip">ISO 27001</span>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-icon">☁️</div>
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:600; margin-bottom:12px;">Cloud Transformation</h3>
+        <p style="color:rgba(226,232,240,0.5); font-size:0.875rem; line-height:1.75; margin-bottom:20px;">
+          End-to-end cloud migration and optimization. Multi-cloud strategy, cost engineering, and DevOps transformation programs.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-chip">AWS</span>
+          <span class="tag-chip">Azure</span>
+          <span class="tag-chip">GCP</span>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="service-card reveal reveal-delay-2">
+        <div class="service-icon">📊</div>
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:600; margin-bottom:12px;">Data Intelligence</h3>
+        <p style="color:rgba(226,232,240,0.5); font-size:0.875rem; line-height:1.75; margin-bottom:20px;">
+          Transform raw data into strategic insight. Real-time analytics platforms, data warehousing, and executive intelligence dashboards.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag-chip">Real-time</span>
+          <span class="tag-chip">BI Dashboards</span>
+        </div>
+      </div>
+
+      <!-- Card 6 — CTA -->
+      <div class="service-card reveal reveal-delay-3 flex flex-col justify-between" style="background:linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(201,168,76,0.03) 100%); border-color:rgba(201,168,76,0.2);">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--gold); letter-spacing:0.15em; margin-bottom:20px;">Custom Solutions</div>
+          <h3 style="font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:600; margin-bottom:12px;">Something Unique in Mind?</h3>
+          <p style="color:rgba(226,232,240,0.5); font-size:0.875rem; line-height:1.75;">
+            We craft bespoke technology solutions tailored to your exact requirements. No off-the-shelf compromises.
+          </p>
+        </div>
+        <a href="#contact" class="btn-primary mt-8" style="align-self:flex-start;">
+          <span>Let's Talk</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     STATS
+════════════════════════════════════════ -->
+<section class="relative z-10 py-20 overflow-hidden">
+  <div class="gold-line"></div>
+  <div style="background:linear-gradient(135deg, rgba(12,17,32,0.8) 0%, rgba(30,58,138,0.1) 100%); padding:60px 0;">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-0 divide-x divide-white divide-opacity-5">
+        <div class="stat-card reveal">
+          <div class="stat-number text-gold-gradient counter-el" data-target="200" data-suffix="+">0</div>
+          <div style="font-size:0.8rem; color:rgba(226,232,240,0.4); letter-spacing:0.08em; margin-top:8px; text-transform:uppercase;">Projects Completed</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-1">
+          <div class="stat-number text-blue-gradient counter-el" data-target="98" data-suffix="%">0</div>
+          <div style="font-size:0.8rem; color:rgba(226,232,240,0.4); letter-spacing:0.08em; margin-top:8px; text-transform:uppercase;">Client Satisfaction</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-2">
+          <div class="stat-number text-gold-gradient counter-el" data-target="50" data-suffix="+">0</div>
+          <div style="font-size:0.8rem; color:rgba(226,232,240,0.4); letter-spacing:0.08em; margin-top:8px; text-transform:uppercase;">Enterprise Clients</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-3">
+          <div class="stat-number text-blue-gradient counter-el" data-target="12" data-suffix="yr">0</div>
+          <div style="font-size:0.8rem; color:rgba(226,232,240,0.4); letter-spacing:0.08em; margin-top:8px; text-transform:uppercase;">Industry Experience</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="gold-line"></div>
+</section>
+
+<!-- ════════════════════════════════════════
+     ABOUT / WHY US
+════════════════════════════════════════ -->
+<section id="about" class="relative z-10 py-28 px-6 md:px-12 lg:px-20 grid-bg">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-20 items-center">
+      <!-- Left -->
+      <div>
+        <div class="section-label reveal mb-5">Why ITS Logic</div>
+        <h2 class="reveal reveal-delay-1" style="font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:700; line-height:1.2; margin-bottom:20px;">
+          Not Just Vendors.<br/>
+          <span class="text-gold-gradient">Your Strategic Partners.</span>
+        </h2>
+        <p class="reveal reveal-delay-2" style="color:rgba(226,232,240,0.55); font-size:0.95rem; line-height:1.8; margin-bottom:36px;">
+          We embed ourselves in your vision. ITS Logic brings together elite engineers, domain strategists, and business architects who work as an extension of your core team — accountable, agile, and obsessively outcomes-driven.
+        </p>
+
+        <div class="reveal reveal-delay-3">
+          <div class="feature-row">
+            <div class="feature-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600; margin-bottom:4px;">Elite Talent Pipeline</div>
+              <div style="font-size:0.85rem; color:rgba(226,232,240,0.5);">Top 3% engineers vetted through rigorous multi-stage assessments across 40+ technical domains.</div>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600; margin-bottom:4px;">Transparent Execution</div>
+              <div style="font-size:0.85rem; color:rgba(226,232,240,0.5);">Real-time project dashboards, weekly C-suite briefings, and zero-surprise billing.</div>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600; margin-bottom:4px;">Guaranteed Outcomes</div>
+              <div style="font-size:0.85rem; color:rgba(226,232,240,0.5);">KPI-aligned delivery with performance guarantees backed by contractual SLAs.</div>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600; margin-bottom:4px;">24/7 Priority Support</div>
+              <div style="font-size:0.85rem; color:rgba(226,232,240,0.5);">Dedicated success teams with sub-15-minute response SLAs for enterprise clients.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right — Visual stack -->
+      <div class="reveal reveal-delay-2 relative flex justify-center">
+        <div class="relative" style="width:100%;max-width:440px;">
+          <!-- Outer glow -->
+          <div style="position:absolute;inset:-40px;background:radial-gradient(ellipse, rgba(37,99,235,0.12) 0%, transparent 70%);"></div>
+
+          <!-- Main panel -->
+          <div class="glass-strong rounded-2xl p-8" style="position:relative;z-index:2;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--gold); letter-spacing:0.2em; margin-bottom:20px;">// EXECUTION FRAMEWORK</div>
+            <div style="space-y:4px;">
+              <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.12);border-radius:8px;padding:16px 20px;margin-bottom:8px;display:flex;align-items:center;gap:16px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0;"></div>
+                <div>
+                  <div style="font-weight:600;font-size:0.85rem;">Discovery & Strategy</div>
+                  <div style="font-size:0.72rem;color:rgba(226,232,240,0.4);margin-top:2px;">Deep-dive into business objectives</div>
+                </div>
+                <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(201,168,76,0.5);">01</div>
+              </div>
+              <div style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.12);border-radius:8px;padding:16px 20px;margin-bottom:8px;display:flex;align-items:center;gap:16px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#3B82F6;flex-shrink:0;"></div>
+                <div>
+                  <div style="font-weight:600;font-size:0.85rem;">Architecture & Design</div>
+                  <div style="font-size:0.72rem;color:rgba(226,232,240,0.4);margin-top:2px;">Blueprint for scalable solutions</div>
+                </div>
+                <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(201,168,76,0.5);">02</div>
+              </div>
+              <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.12);border-radius:8px;padding:16px 20px;margin-bottom:8px;display:flex;align-items:center;gap:16px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#C9A84C;flex-shrink:0;"></div>
+                <div>
+                  <div style="font-weight:600;font-size:0.85rem;">Agile Delivery</div>
+                  <div style="font-size:0.72rem;color:rgba(226,232,240,0.4);margin-top:2px;">Sprint-based execution with visibility</div>
+                </div>
+                <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(201,168,76,0.5);">03</div>
+              </div>
+              <div style="background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.12);border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:16px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#A78BFA;flex-shrink:0;"></div>
+                <div>
+                  <div style="font-weight:600;font-size:0.85rem;">Optimize & Scale</div>
+                  <div style="font-size:0.72rem;color:rgba(226,232,240,0.4);margin-top:2px;">Continuous improvement post-launch</div>
+                </div>
+                <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(201,168,76,0.5);">04</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating chip -->
+          <div class="glass-strong rounded-xl p-4 absolute" style="bottom:-24px;left:-20px;z-index:3;min-width:160px;">
+            <div style="font-size:0.65rem;color:rgba(201,168,76,0.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Avg. Time to Value</div>
+            <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;" class="text-gold-gradient">6 Weeks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     PROCESS
+════════════════════════════════════════ -->
+<section id="process" class="relative z-10 py-28 px-6 md:px-12 lg:px-20">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-20">
+      <div class="section-label justify-center reveal mb-5">How We Work</div>
+      <h2 class="reveal reveal-delay-1" style="font-family:'Playfair Display',serif; font-size:clamp(2rem,3.5vw,3rem); font-weight:700; line-height:1.15;">
+        A Methodology Refined<br/>Over <span class="text-gold-gradient">12 Years</span>
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div class="reveal process-step" style="padding-left:0; text-align:center;">
+        <div style="width:64px;height:64px;border-radius:16px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--gold);">1</div>
+        <h3 style="font-weight:600;font-size:1.05rem;margin-bottom:10px;">Discovery</h3>
+        <p style="font-size:0.85rem;color:rgba(226,232,240,0.45);line-height:1.7;">We map your landscape — goals, gaps, competition, and technical debt — before writing a single line of code.</p>
+      </div>
+      <div class="reveal reveal-delay-1 process-step" style="padding-left:0; text-align:center;">
+        <div style="width:64px;height:64px;border-radius:16px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#60A5FA;">2</div>
+        <h3 style="font-weight:600;font-size:1.05rem;margin-bottom:10px;">Blueprint</h3>
+        <p style="font-size:0.85rem;color:rgba(226,232,240,0.45);line-height:1.7;">Architects design your solution with modularity and scalability as first principles, not afterthoughts.</p>
+      </div>
+      <div class="reveal reveal-delay-2 process-step" style="padding-left:0; text-align:center;">
+        <div style="width:64px;height:64px;border-radius:16px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--gold);">3</div>
+        <h3 style="font-weight:600;font-size:1.05rem;margin-bottom:10px;">Build</h3>
+        <p style="font-size:0.85rem;color:rgba(226,232,240,0.45);line-height:1.7;">Rapid sprint cycles with continuous integration, automated testing, and stakeholder demos every two weeks.</p>
+      </div>
+      <div class="reveal reveal-delay-3 process-step" style="padding-left:0; text-align:center;">
+        <div style="width:64px;height:64px;border-radius:16px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#A78BFA;">4</div>
+        <h3 style="font-weight:600;font-size:1.05rem;margin-bottom:10px;">Scale</h3>
+        <p style="font-size:0.85rem;color:rgba(226,232,240,0.45);line-height:1.7;">Post-launch optimization, monitoring, and evolution — we're a long-term partner, not a one-time vendor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════ -->
+<section id="clients" class="relative z-10 py-28 px-6 md:px-12 lg:px-20" style="background:linear-gradient(180deg, transparent, rgba(12,17,32,0.8) 20%, rgba(12,17,32,0.8) 80%, transparent);">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-20">
+      <div class="section-label justify-center reveal mb-5">Client Stories</div>
+      <h2 class="reveal reveal-delay-1" style="font-family:'Playfair Display',serif; font-size:clamp(2rem,3.5vw,3rem); font-weight:700;">
+        Trusted by <span class="text-gold-gradient">Industry Leaders</span>
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="testimonial-card reveal">
+        <div class="stars mb-4">★★★★★</div>
+        <p style="color:rgba(226,232,240,0.7); font-size:0.9rem; line-height:1.8; margin-bottom:24px; font-style:italic;">
+          "ITS Logic didn't just deliver a platform — they transformed how we operate. Our processing time dropped by 70% in the first quarter."
+        </p>
+        <div class="flex items-center gap-12">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#B8922E);display:flex;align-items:center;justify-content:center;font-weight:700;color:#06080E;font-size:0.9rem;">MC</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;">Maria Cruz</div>
+            <div style="font-size:0.75rem;color:rgba(226,232,240,0.4);">CTO, Meridian Financial Group</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="stars mb-4">★★★★★</div>
+        <p style="color:rgba(226,232,240,0.7); font-size:0.9rem; line-height:1.8; margin-bottom:24px; font-style:italic;">
+          "The security overhaul ITS Logic executed was flawless. Zero-trust implemented across 12 regions with no operational disruption."
+        </p>
+        <div class="flex items-center gap-12">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3B82F6,#1D4ED8);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:0.9rem;">JR</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;">James Reyes</div>
+            <div style="font-size:0.75rem;color:rgba(226,232,240,0.4);">CISO, NovaTrade Corporation</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="stars mb-4">★★★★★</div>
+        <p style="color:rgba(226,232,240,0.7); font-size:0.9rem; line-height:1.8; margin-bottom:24px; font-style:italic;">
+          "From concept to launch in 8 weeks. Their AI recommendation engine increased our conversion rate by 42%. Exceptional team."
+        </p>
+        <div class="flex items-center gap-12">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#A78BFA,#7C3AED);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:0.9rem;">SL</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;">Sarah Lim</div>
+            <div style="font-size:0.75rem;color:rgba(226,232,240,0.4);">VP Digital, Apex Retail Holdings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     CTA BANNER
+════════════════════════════════════════ -->
+<section class="relative z-10 py-20 px-6 md:px-12 lg:px-20 overflow-hidden">
+  <div class="max-w-7xl mx-auto">
+    <div class="glass-strong rounded-2xl p-12 md:p-16 glow-gold relative overflow-hidden reveal">
+      <!-- Background decoration -->
+      <div style="position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);"></div>
+      <div style="position:absolute;left:-40px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%);"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+        <div style="max-width:600px;">
+          <div class="section-label mb-5">Limited Availability</div>
+          <h2 style="font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:700; line-height:1.2; margin-bottom:16px;">
+            Ready to Build Something<br/><span class="text-gold-gradient">Extraordinary?</span>
+          </h2>
+          <p style="color:rgba(226,232,240,0.55); font-size:0.95rem; line-height:1.7;">
+            We accept a selective number of enterprise engagements per quarter to ensure the highest quality of service. Secure your consultation today.
+          </p>
+        </div>
+        <div class="flex flex-col gap-4" style="flex-shrink:0;">
+          <a href="#contact" class="btn-primary" style="text-align:center;justify-content:center;">
+            <span>Schedule Consultation</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </a>
+          <div style="font-size:0.72rem; color:rgba(226,232,240,0.35); text-align:center;">No commitment required</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     CONTACT
+════════════════════════════════════════ -->
+<section id="contact" class="relative z-10 py-28 px-6 md:px-12 lg:px-20">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-16">
+      <!-- Left -->
+      <div>
+        <div class="section-label reveal mb-5">Get In Touch</div>
+        <h2 class="reveal reveal-delay-1" style="font-family:'Playfair Display',serif; font-size:clamp(2rem,3vw,2.8rem); font-weight:700; line-height:1.2; margin-bottom:16px;">
+          Start Your<br/><span class="text-gold-gradient">Transformation</span>
+        </h2>
+        <p class="reveal reveal-delay-2" style="color:rgba(226,232,240,0.55); font-size:0.95rem; line-height:1.8; margin-bottom:40px;">
+          Tell us about your vision. Our senior consultants will respond within 24 hours with initial insights — no generic sales pitch, just genuine strategic value.
+        </p>
+
+        <div class="reveal reveal-delay-3 flex flex-col gap-6">
+          <div class="flex items-center gap-4">
+            <div style="width:44px;height:44px;border-radius:10px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
+            <div>
+              <div style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Email</div>
+              <div style="font-size:0.9rem;">hello@itslogic.io</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div style="width:44px;height:44px;border-radius:10px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">📞</div>
+            <div>
+              <div style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Phone</div>
+              <div style="font-size:0.9rem;">+63 (2) 8XXX-XXXX</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div style="width:44px;height:44px;border-radius:10px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">📍</div>
+            <div>
+              <div style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Headquarters</div>
+              <div style="font-size:0.9rem;">BGC, Taguig City, Philippines</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right — Form -->
+      <div class="reveal reveal-delay-2">
+        <div class="glass-strong rounded-2xl p-8">
+          <form id="contactForm" onsubmit="handleSubmit(event)">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:8px;">First Name</label>
+                <input type="text" class="form-input" placeholder="John" required />
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:8px;">Last Name</label>
+                <input type="text" class="form-input" placeholder="Smith" required />
+              </div>
+            </div>
+            <div class="mb-4">
+              <label style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:8px;">Business Email</label>
+              <input type="email" class="form-input" placeholder="john@company.com" required />
+            </div>
+            <div class="mb-4">
+              <label style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:8px;">Company</label>
+              <input type="text" class="form-input" placeholder="Your Company Name" />
+            </div>
+            <div class="mb-4">
+              <label style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:8px;">Service Interest</label>
+              <select class="form-input" style="appearance:none;cursor:pointer;">
+                <option value="" style="background:var(--dark-3);">Select a service...</option>
+                <option style="background:var(--dark-3);">Enterprise Architecture</option>
+                <option style="background:var(--dark-3);">AI & Machine Learning</option>
+                <option style="background:var(--dark-3);">Cybersecurity</option>
+                <option style="background:var(--dark-3);">Cloud Transformation</option>
+                <option style="background:var(--dark-3);">Data Intelligence</option>
+                <option style="background:var(--dark-3);">Custom Solution</option>
+              </select>
+            </div>
+            <div class="mb-6">
+              <label style="font-size:0.72rem;color:rgba(226,232,240,0.4);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:8px;">Project Brief</label>
+              <textarea class="form-input" placeholder="Tell us about your challenge and vision..." required></textarea>
+            </div>
+            <button type="submit" class="btn-primary w-full justify-center">
+              <span>Send Message</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div id="formSuccess" style="display:none;margin-top:16px;text-align:center;color:var(--gold-light);font-size:0.875rem;">
+              ✓ Message received. We'll be in touch within 24 hours.
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer class="relative z-10 pt-16 pb-8 px-6 md:px-12 lg:px-20" style="border-top:1px solid rgba(255,255,255,0.05);">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-4 gap-12 mb-12">
+      <!-- Brand -->
+      <div class="md:col-span-1">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#06080E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.1rem;" class="text-gold-gradient">ITS Logic</span>
+        </div>
+        <p style="font-size:0.82rem;color:rgba(226,232,240,0.35);line-height:1.7;margin-bottom:20px;">
+          Intelligent Technology Solutions for the enterprise of tomorrow.
+        </p>
+        <div class="flex gap-3">
+          <a href="#" style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(226,232,240,0.4);transition:all 0.3s;text-decoration:none;font-size:14px;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)';this.style.color='var(--gold-light)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.color='rgba(226,232,240,0.4)'">in</a>
+          <a href="#" style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(226,232,240,0.4);transition:all 0.3s;text-decoration:none;font-size:14px;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)';this.style.color='var(--gold-light)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.color='rgba(226,232,240,0.4)'">𝕏</a>
+          <a href="#" style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(226,232,240,0.4);transition:all 0.3s;text-decoration:none;font-size:14px;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)';this.style.color='var(--gold-light)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.color='rgba(226,232,240,0.4)'">gh</a>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:16px;">Services</div>
+        <div class="flex flex-col gap-3">
+          <a href="#services">Enterprise Architecture</a>
+          <a href="#services">AI & Machine Learning</a>
+          <a href="#services">Cybersecurity</a>
+          <a href="#services">Cloud Transformation</a>
+          <a href="#services">Data Intelligence</a>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:16px;">Company</div>
+        <div class="flex flex-col gap-3">
+          <a href="#about">About ITS Logic</a>
+          <a href="#process">Our Process</a>
+          <a href="#clients">Case Studies</a>
+          <a href="#">Careers</a>
+          <a href="#">Blog</a>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:16px;">Legal</div>
+        <div class="flex flex-col gap-3">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Security Policy</a>
+          <a href="#">Compliance</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="gold-line mb-8"></div>
+
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div style="font-size:0.78rem;color:rgba(226,232,240,0.25);">© 2025 ITS Logic. All rights reserved. Intelligent Technology Solutions.</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(201,168,76,0.3);letter-spacing:0.15em;">BGC, TAGUIG CITY, PHILIPPINES</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════ -->
+<script>
+// ── AURORA CANVAS ──────────────────────────────────────────
+const canvas = document.getElementById('aurora-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const orbs = [
+  { x: 0.2, y: 0.3, r: 0.35, color: [30, 58, 138], speed: 0.0003, phase: 0 },
+  { x: 0.7, y: 0.6, r: 0.3,  color: [201, 168, 76], speed: 0.0004, phase: 2 },
+  { x: 0.5, y: 0.8, r: 0.25, color: [124, 58, 237], speed: 0.0002, phase: 4 },
+  { x: 0.85, y: 0.2, r: 0.2, color: [37, 99, 235], speed: 0.0005, phase: 1 },
+];
+
+let t = 0;
+function drawAurora() {
+  t += 1;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  orbs.forEach(orb => {
+    const cx = (orb.x + Math.sin(t * orb.speed + orb.phase) * 0.15) * canvas.width;
+    const cy = (orb.y + Math.cos(t * orb.speed * 0.7 + orb.phase) * 0.1) * canvas.height;
+    const r = orb.r * Math.min(canvas.width, canvas.height);
+
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    grad.addColorStop(0, `rgba(${orb.color.join(',')}, 0.18)`);
+    grad.addColorStop(0.5, `rgba(${orb.color.join(',')}, 0.06)`);
+    grad.addColorStop(1, `rgba(${orb.color.join(',')}, 0)`);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawAurora);
+}
+drawAurora();
+
+// ── CUSTOM CURSOR ─────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursor.style.left = mouseX - 4 + 'px';
+  cursor.style.top = mouseY - 4 + 'px';
+});
+
+function animateRing() {
+  ringX += (mouseX - ringX) * 0.12;
+  ringY += (mouseY - ringY) * 0.12;
+  cursorRing.style.left = ringX - 18 + 'px';
+  cursorRing.style.top = ringY - 18 + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .service-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.transform = 'scale(2)';
+    cursorRing.style.width = '56px';
+    cursorRing.style.height = '56px';
+    cursorRing.style.borderColor = 'rgba(201,168,76,0.8)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.transform = 'scale(1)';
+    cursorRing.style.width = '36px';
+    cursorRing.style.height = '36px';
+    cursorRing.style.borderColor = 'rgba(201,168,76,0.5)';
+  });
+});
+
+// ── NAV SCROLL ────────────────────────────────────────────
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ── MOBILE MENU ───────────────────────────────────────────
+let menuOpen = false;
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const ham1 = document.getElementById('ham1');
+const ham2 = document.getElementById('ham2');
+const ham3 = document.getElementById('ham3');
+
+menuBtn.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  mobileMenu.classList.toggle('open', menuOpen);
+  ham1.style.transform = menuOpen ? 'rotate(45deg) translate(5px, 5px)' : '';
+  ham2.style.opacity = menuOpen ? '0' : '1';
+  ham3.style.transform = menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : '';
+});
+
+function closeMobile() {
+  menuOpen = false;
+  mobileMenu.classList.remove('open');
+  ham1.style.transform = '';
+  ham2.style.opacity = '1';
+  ham3.style.transform = '';
+}
+
+// ── SCROLL REVEAL ─────────────────────────────────────────
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── COUNTER ANIMATION ──────────────────────────────────────
+const counterObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !entry.target.dataset.animated) {
+      entry.target.dataset.animated = 'true';
+      const target = parseInt(entry.target.dataset.target);
+      const suffix = entry.target.dataset.suffix || '';
+      const duration = 2000;
+      const steps = 60;
+      const increment = target / steps;
+      let current = 0;
+      const interval = setInterval(() => {
+        current = Math.min(current + increment, target);
+        entry.target.textContent = Math.floor(current) + suffix;
+        if (current >= target) clearInterval(interval);
+      }, duration / steps);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.counter-el').forEach(el => counterObserver.observe(el));
+
+// ── FORM SUBMIT ───────────────────────────────────────────
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('formSuccess').style.display = 'block';
+    e.target.reset();
+    btn.style.opacity = '1';
+    btn.disabled = false;
+  }, 1200);
+}
+
+// ── HERO ENTRANCE ──────────────────────────────────────────
+window.addEventListener('load', () => {
+  const items = [
+    { el: '#heroBadge', delay: 0 },
+    { el: '#heroTitle', delay: 150 },
+    { el: '#heroSub', delay: 300 },
+    { el: '#heroCta', delay: 450 },
+    { el: '#heroStats', delay: 600 },
+    { el: '#heroVisual', delay: 300 },
+  ];
+
+  items.forEach(({ el, delay }) => {
+    const element = document.querySelector(el);
+    if (!element) return;
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      element.style.transition = 'opacity 0.9s ease, transform 0.9s ease';
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, delay + 100);
+  });
+});
+
+// ── SMOOTH PARALLAX ────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const hero = document.getElementById('hero');
+  if (hero) {
+    hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+  }
+});
+</script>
+</body>
+</html>
