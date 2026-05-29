@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,18 +12,17 @@
   <!-- jsPDF + html2canvas for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- pdf.js for reading exported PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            navy:   '#0A0F1E',
-            navy2:  '#111a32',
-            navy3:  '#18233f',
             eblue:  '#3B82F6',
-            eblue2: '#60A5FA',
+            eblue2: '#2563EB',
+            navy:   '#0A0F1E',
           },
           fontFamily: {
             sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -40,29 +39,29 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #0A0F1E; }
+    ::-webkit-scrollbar-track { background: #eef2f9; }
     ::-webkit-scrollbar-thumb { background: #3B82F6; border-radius: 4px; }
     /* hide number input spinners */
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
     .tab-btn.active { background: #3B82F6; color: #fff; }
-    .field-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93a4c4; font-weight: 600; }
+    .field-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; }
     .inp {
-      background: #0A0F1E; border: 1px solid #2a3a5e; color: #fff;
+      background: #ffffff; border: 1px solid #d8dee9; color: #0f172a;
       border-radius: 0.5rem; padding: 0.55rem 0.75rem; width: 100%; outline: none;
       transition: border-color .15s;
     }
-    .inp:focus { border-color: #3B82F6; }
-    .inp:read-only { background: #0c1326; color: #60A5FA; font-weight: 700; }
+    .inp:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+    .inp:read-only { background: #f1f5fd; color: #2563EB; font-weight: 700; }
     @media print { .no-print { display: none !important; } }
   </style>
 </head>
 
-<body class="bg-navy text-white min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col">
 
   <!-- ===================== HEADER ===================== -->
-  <header class="no-print border-b border-navy3 bg-navy2/60 backdrop-blur sticky top-0 z-40">
+  <header class="no-print border-b border-slate-200 bg-white/80 backdrop-blur sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <!-- Logo placeholder: NXT-Gen Hex -->
@@ -73,18 +72,18 @@
             <polygon points="50,22 75,36 75,64 50,78 25,64 25,36"
                      fill="#3B82F6" opacity="0.18"/>
           </svg>
-          <span class="absolute text-eblue2 font-black text-sm">NG</span>
+          <span class="absolute text-eblue font-black text-sm">NG</span>
         </div>
         <div>
           <h1 class="text-lg sm:text-xl font-extrabold leading-tight">NXT-Gen <span class="text-eblue">Client Dashboard</span></h1>
-          <p class="text-[11px] text-slate-400 -mt-0.5">Digital Marketing Agency · Philippines</p>
+          <p class="text-[11px] text-slate-500 -mt-0.5">Digital Marketing Agency · Philippines</p>
         </div>
       </div>
       <nav class="flex gap-2">
-        <button data-tab="report" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-navy3 text-slate-300 transition">
+        <button data-tab="report" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 transition">
           📊 <span class="hidden sm:inline">Report Generator</span><span class="sm:hidden">Report</span>
         </button>
-        <button data-tab="pipeline" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-navy3 text-slate-300 transition">
+        <button data-tab="pipeline" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 transition">
           🚀 <span class="hidden sm:inline">Pipeline Tracker</span><span class="sm:hidden">Pipeline</span>
         </button>
       </nav>
@@ -98,7 +97,7 @@
       <div class="grid lg:grid-cols-2 gap-6">
 
         <!-- ---------- INPUT FORM ---------- -->
-        <div class="no-print bg-navy2 rounded-2xl border border-navy3 p-5">
+        <div class="no-print bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
           <h2 class="text-lg font-bold mb-4 flex items-center gap-2">📝 Report Inputs</h2>
           <form id="reportForm" class="space-y-4">
             <div>
@@ -190,17 +189,27 @@
 
         <!-- ---------- REPORT PREVIEW ---------- -->
         <div>
-          <div class="no-print flex items-center justify-between mb-3">
+          <div class="no-print flex flex-wrap items-center justify-between gap-2 mb-3">
             <h2 class="text-lg font-bold flex items-center gap-2">👁️ Live Preview</h2>
-            <button id="downloadPdf" class="bg-eblue hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-              ⬇️ Download as PDF
-            </button>
+            <div class="flex flex-wrap gap-2">
+              <input id="importFile" type="file" accept=".csv,.pdf" class="hidden" />
+              <button id="importBtn" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition flex items-center gap-1.5 shadow-sm">
+                📥 Import CSV / PDF
+              </button>
+              <button id="exportCsv" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition flex items-center gap-1.5 shadow-sm">
+                📄 Export CSV
+              </button>
+              <button id="downloadPdf" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center gap-1.5 shadow-sm">
+                ⬇️ Download as PDF
+              </button>
+            </div>
           </div>
+          <p id="importStatus" class="no-print hidden text-xs mb-2 px-3 py-2 rounded-lg"></p>
 
           <!-- This whole block is what gets exported -->
-          <div id="reportCanvas" class="bg-navy2 rounded-2xl border border-navy3 p-6" style="background:#0A0F1E;">
+          <div id="reportCanvas" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6" style="background:#ffffff;">
             <!-- report header -->
-            <div class="flex items-center justify-between pb-4 border-b border-navy3">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
               <div class="flex items-center gap-3">
                 <svg viewBox="0 0 100 100" class="w-10 h-10">
                   <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#3B82F6" stroke-width="6"/>
@@ -208,24 +217,24 @@
                 </svg>
                 <div>
                   <p class="text-eblue font-black text-sm tracking-wide">NXT-GEN HEX</p>
-                  <p class="text-[10px] text-slate-400">Marketing Performance Report</p>
+                  <p class="text-[10px] text-slate-500">Marketing Performance Report</p>
                 </div>
               </div>
               <div class="text-right">
-                <p id="p_client" class="text-xl font-extrabold text-white">—</p>
-                <p id="p_period" class="text-xs text-slate-400">—</p>
-                <p id="p_platform" class="text-[11px] text-eblue2 font-semibold mt-0.5">—</p>
+                <p id="p_client" class="text-xl font-extrabold text-slate-900">—</p>
+                <p id="p_period" class="text-xs text-slate-500">—</p>
+                <p id="p_platform" class="text-[11px] text-eblue font-semibold mt-0.5">—</p>
               </div>
             </div>
 
             <!-- highlighted hero metrics: ROAS & CPL -->
             <div class="grid grid-cols-2 gap-4 mt-5">
-              <div id="hero_roas" class="rounded-xl p-4 border" style="background:#0c1326;border-color:#2a3a5e;">
+              <div id="hero_roas" class="rounded-xl p-4 border-2" style="background:#f8fafc;border-color:#e2e8f0;">
                 <p class="field-label">Return On Ad Spend</p>
                 <p id="p_roas" class="text-4xl font-black mt-1">0.00x</p>
                 <p id="p_roas_tag" class="text-xs font-semibold mt-1">—</p>
               </div>
-              <div id="hero_cpl" class="rounded-xl p-4 border" style="background:#0c1326;border-color:#2a3a5e;">
+              <div id="hero_cpl" class="rounded-xl p-4 border-2" style="background:#f8fafc;border-color:#e2e8f0;">
                 <p class="field-label">Cost Per Lead</p>
                 <p id="p_cpl" class="text-4xl font-black mt-1">₱0.00</p>
                 <p id="p_cpl_tag" class="text-xs font-semibold mt-1">—</p>
@@ -234,61 +243,61 @@
 
             <!-- money cards -->
             <div class="grid grid-cols-2 gap-4 mt-4">
-              <div class="rounded-xl p-4 bg-navy3/60 border border-navy3">
+              <div class="rounded-xl p-4 bg-slate-50 border border-slate-200">
                 <p class="field-label">Total Ad Spend</p>
-                <p id="p_spend" class="text-2xl font-black text-white mt-1">₱0</p>
+                <p id="p_spend" class="text-2xl font-black text-slate-900 mt-1">₱0</p>
               </div>
-              <div class="rounded-xl p-4 bg-navy3/60 border border-navy3">
+              <div class="rounded-xl p-4 bg-slate-50 border border-slate-200">
                 <p class="field-label">Total Revenue</p>
-                <p id="p_revenue" class="text-2xl font-black text-eblue2 mt-1">₱0</p>
+                <p id="p_revenue" class="text-2xl font-black text-eblue mt-1">₱0</p>
               </div>
             </div>
 
             <!-- funnel metric cards -->
             <div class="grid grid-cols-4 gap-3 mt-4">
-              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+              <div class="rounded-xl p-3 bg-slate-50 border border-slate-200 text-center">
                 <p class="field-label">Reach</p>
-                <p id="p_reach" class="text-xl font-black text-white mt-1">0</p>
+                <p id="p_reach" class="text-xl font-black text-slate-900 mt-1">0</p>
               </div>
-              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+              <div class="rounded-xl p-3 bg-slate-50 border border-slate-200 text-center">
                 <p class="field-label">Impressions</p>
-                <p id="p_impressions" class="text-xl font-black text-white mt-1">0</p>
+                <p id="p_impressions" class="text-xl font-black text-slate-900 mt-1">0</p>
               </div>
-              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+              <div class="rounded-xl p-3 bg-slate-50 border border-slate-200 text-center">
                 <p class="field-label">Clicks</p>
-                <p id="p_clicks" class="text-xl font-black text-white mt-1">0</p>
+                <p id="p_clicks" class="text-xl font-black text-slate-900 mt-1">0</p>
               </div>
-              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+              <div class="rounded-xl p-3 bg-slate-50 border border-slate-200 text-center">
                 <p class="field-label">Leads</p>
-                <p id="p_leads" class="text-xl font-black text-white mt-1">0</p>
+                <p id="p_leads" class="text-xl font-black text-slate-900 mt-1">0</p>
               </div>
             </div>
 
             <!-- chart -->
-            <div class="rounded-xl p-4 bg-navy3/40 border border-navy3 mt-4">
+            <div class="rounded-xl p-4 bg-slate-50 border border-slate-200 mt-4">
               <p class="field-label mb-2">Funnel Performance</p>
               <div style="height:240px;"><canvas id="funnelChart"></canvas></div>
             </div>
 
             <!-- top content -->
-            <div class="rounded-xl p-4 bg-navy3/40 border border-navy3 mt-4">
+            <div class="rounded-xl p-4 bg-slate-50 border border-slate-200 mt-4">
               <p class="field-label">🏆 Top Performing Content</p>
-              <p id="p_topcontent" class="text-sm text-white mt-1">—</p>
+              <p id="p_topcontent" class="text-sm text-slate-800 mt-1">—</p>
             </div>
 
             <!-- recommendations + notes -->
             <div class="grid sm:grid-cols-2 gap-4 mt-4">
-              <div class="rounded-xl p-4 border" style="background:#0c1326;border-color:#3B82F6;">
-                <p class="field-label text-eblue2">📈 Recommendations · Next Month</p>
-                <p id="p_recommend" class="text-sm text-slate-200 mt-1 whitespace-pre-wrap">—</p>
+              <div class="rounded-xl p-4 border" style="background:#eff6ff;border-color:#3B82F6;">
+                <p class="field-label" style="color:#2563EB;">📈 Recommendations · Next Month</p>
+                <p id="p_recommend" class="text-sm text-slate-700 mt-1 whitespace-pre-wrap">—</p>
               </div>
-              <div class="rounded-xl p-4 bg-navy3/40 border border-navy3">
+              <div class="rounded-xl p-4 bg-slate-50 border border-slate-200">
                 <p class="field-label">🗒️ Agency Notes</p>
-                <p id="p_notes" class="text-sm text-slate-300 mt-1 whitespace-pre-wrap">—</p>
+                <p id="p_notes" class="text-sm text-slate-700 mt-1 whitespace-pre-wrap">—</p>
               </div>
             </div>
 
-            <div class="text-center text-[10px] text-slate-500 mt-5 pt-3 border-t border-navy3">
+            <div class="text-center text-[10px] text-slate-400 mt-5 pt-3 border-t border-slate-200">
               NXT-Gen Hex | Powered by NextGen Capital · Generated <span id="p_gendate"></span>
             </div>
           </div>
@@ -301,15 +310,15 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
           <h2 class="text-lg font-bold">🚀 Client Pipeline Tracker</h2>
-          <p class="text-sm text-slate-400">FBPH sales process · 11 phases · <span id="clientCount">0</span> client(s)</p>
+          <p class="text-sm text-slate-500">FBPH sales process · 11 phases · <span id="clientCount">0</span> client(s)</p>
         </div>
-        <button id="addClientBtn" class="bg-eblue hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+        <button id="addClientBtn" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm">
           ➕ Add New Client
         </button>
       </div>
 
       <div id="clientList" class="space-y-4"></div>
-      <div id="emptyState" class="text-center py-16 text-slate-500">
+      <div id="emptyState" class="text-center py-16 text-slate-400">
         <p class="text-5xl mb-3">📭</p>
         <p>No clients yet. Click <span class="text-eblue font-semibold">"Add New Client"</span> to begin.</p>
       </div>
@@ -317,15 +326,15 @@
   </main>
 
   <!-- ===================== FOOTER ===================== -->
-  <footer class="no-print border-t border-navy3 bg-navy2/60 mt-6">
-    <div class="max-w-7xl mx-auto px-4 py-4 text-center text-xs text-slate-400">
-      <span class="text-eblue2 font-bold">NXT-Gen Hex</span> | Powered by <span class="font-semibold text-slate-300">NextGen Capital</span>
+  <footer class="no-print border-t border-slate-200 bg-white mt-6">
+    <div class="max-w-7xl mx-auto px-4 py-4 text-center text-xs text-slate-500">
+      <span class="text-eblue font-bold">NXT-Gen Hex</span> | Powered by <span class="font-semibold text-slate-700">NextGen Capital</span>
     </div>
   </footer>
 
   <!-- ===================== ADD CLIENT MODAL ===================== -->
-  <div id="clientModal" class="no-print hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-    <div class="bg-navy2 border border-navy3 rounded-2xl w-full max-w-md p-6">
+  <div id="clientModal" class="no-print hidden fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl">
       <h3 class="text-lg font-bold mb-4">➕ Add New Client</h3>
       <div class="space-y-4">
         <div>
@@ -348,8 +357,8 @@
         </div>
       </div>
       <div class="flex gap-3 mt-6">
-        <button id="cancelClient" class="flex-1 bg-navy3 hover:bg-navy3/70 text-slate-200 font-semibold py-2 rounded-lg transition">Cancel</button>
-        <button id="saveClient" class="flex-1 bg-eblue hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition">Save Client</button>
+        <button id="cancelClient" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-lg transition">Cancel</button>
+        <button id="saveClient" class="flex-1 bg-eblue hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">Save Client</button>
       </div>
     </div>
   </div>
@@ -378,6 +387,36 @@
   const peso = (n) => '₱' + (Number(n) || 0).toLocaleString('en-PH', { maximumFractionDigits: 2 });
   const num  = (n) => (Number(n) || 0).toLocaleString('en-PH');
   const $ = (id) => document.getElementById(id);
+
+  // Field definitions used for CSV export/import (id, human label, numeric?)
+  const FIELD_DEFS = [
+    { id:'r_client',      label:'Client Name',          numeric:false },
+    { id:'r_month',       label:'Report Month',         numeric:false },
+    { id:'r_year',        label:'Report Year',          numeric:false },
+    { id:'r_platform',    label:'Ad Platform',          numeric:false },
+    { id:'r_spend',       label:'Total Ad Spend',       numeric:true  },
+    { id:'r_revenue',     label:'Total Revenue',        numeric:true  },
+    { id:'r_reach',       label:'Total Reach',          numeric:true  },
+    { id:'r_impressions', label:'Total Impressions',    numeric:true  },
+    { id:'r_clicks',      label:'Total Link Clicks',    numeric:true  },
+    { id:'r_leads',       label:'Total Leads',          numeric:true  },
+    { id:'r_topcontent',  label:'Top Performing Content', numeric:false },
+    { id:'r_recommend',   label:'Recommendations',      numeric:false },
+    { id:'r_notes',       label:'Agency Notes',         numeric:false },
+  ];
+  // lowercase label -> id (for matching our own CSV exports)
+  const LABEL_TO_ID = {};
+  FIELD_DEFS.forEach(f => LABEL_TO_ID[f.label.toLowerCase()] = f.id);
+
+  // keyword groups for auto-detecting raw ad-platform CSV column headers
+  const PLATFORM_COLS = {
+    r_spend:       ['amount spent','ad spend','spend','cost','amount_spent','total spend'],
+    r_revenue:     ['purchase conversion value','conversion value','revenue','purchases value','total revenue','sales'],
+    r_reach:       ['reach'],
+    r_impressions: ['impressions','impr.','impression'],
+    r_clicks:      ['link clicks','clicks','link click','clicks (all)'],
+    r_leads:       ['leads','results','conversions','lead','website leads'],
+  };
 
   // ============================================================
   //  TAB SWITCHING
@@ -425,17 +464,17 @@
     }
   }
 
-  // color thresholds -> returns {color, bg, label}
+  // color thresholds -> returns {color, label}
   function roasStatus(roas) {
-    if (roas >= 3)   return { color:'#22c55e', label:'Excellent' };
-    if (roas >= 1.5) return { color:'#eab308', label:'Okay' };
-    return { color:'#ef4444', label:'Needs Attention' };
+    if (roas >= 3)   return { color:'#16a34a', label:'Excellent' };
+    if (roas >= 1.5) return { color:'#ca8a04', label:'Okay' };
+    return { color:'#dc2626', label:'Needs Attention' };
   }
   function cplStatus(cpl, hasLeads) {
     if (!hasLeads)    return { color:'#64748b', label:'No leads yet' };
-    if (cpl <= 200)   return { color:'#22c55e', label:'Excellent' };
-    if (cpl <= 500)   return { color:'#eab308', label:'Okay' };
-    return { color:'#ef4444', label:'Needs Attention' };
+    if (cpl <= 200)   return { color:'#16a34a', label:'Excellent' };
+    if (cpl <= 500)   return { color:'#ca8a04', label:'Okay' };
+    return { color:'#dc2626', label:'Needs Attention' };
   }
 
   function renderReport() {
@@ -511,8 +550,8 @@
           animation: { duration: 300 },
           plugins: { legend: { display: false } },
           scales: {
-            x: { ticks: { color: '#93a4c4' }, grid: { display: false } },
-            y: { ticks: { color: '#93a4c4' }, grid: { color: '#1e293b' }, beginAtZero: true },
+            x: { ticks: { color: '#475569' }, grid: { display: false } },
+            y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' }, beginAtZero: true },
           },
         },
       });
@@ -532,10 +571,17 @@
     btn.disabled = true; btn.innerHTML = '⏳ Generating...';
     try {
       const el = $('reportCanvas');
-      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0A0F1E', useCORS: true });
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
       const img = canvas.toDataURL('image/png');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
+      // embed structured report data so the PDF can be re-imported later
+      const dEmbed = getReportData();
+      pdf.setProperties({
+        title: `${dEmbed.r_client || 'Client'} — ${dEmbed.r_month || ''} ${dEmbed.r_year || ''} Report`,
+        subject: 'NXT-Gen Hex Marketing Performance Report',
+        keywords: 'NXTGENDATA:' + JSON.stringify(dEmbed),
+      });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
       const imgW = pageW;
@@ -558,6 +604,154 @@
     } finally {
       btn.disabled = false; btn.innerHTML = orig;
     }
+  });
+
+  // ---------- status helper ----------
+  function showImportStatus(msg, ok) {
+    const el = $('importStatus');
+    el.textContent = msg;
+    el.className = 'no-print text-xs mb-2 px-3 py-2 rounded-lg ' +
+      (ok ? 'bg-green-50 text-green-700 border border-green-200'
+          : 'bg-red-50 text-red-700 border border-red-200');
+    el.classList.remove('hidden');
+  }
+
+  // ---------- CSV export (round-trippable Field,Value format) ----------
+  function csvEscape(v) {
+    v = (v ?? '').toString();
+    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  }
+  $('exportCsv').addEventListener('click', () => {
+    const d = getReportData();
+    const spend = Number(d.r_spend) || 0, leads = Number(d.r_leads) || 0, revenue = Number(d.r_revenue) || 0;
+    const rows = [['Field', 'Value']];
+    FIELD_DEFS.forEach(f => rows.push([f.label, d[f.id] || '']));
+    // include the computed metrics for reference (not re-imported)
+    rows.push(['Cost Per Lead', leads > 0 ? (spend / leads).toFixed(2) : '']);
+    rows.push(['ROAS', spend > 0 ? (revenue / spend).toFixed(2) : '']);
+    const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const safe = (s) => (s || 'report').replace(/[^a-z0-9]+/gi, '-');
+    a.href = url;
+    a.download = `${safe(d.r_client)}-${safe(d.r_month)}-${d.r_year || ''}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // ---------- minimal CSV parser (handles quotes & commas) ----------
+  function parseCSV(text) {
+    const rows = []; let row = [], field = '', inQ = false;
+    text = text.replace(/^﻿/, '');
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQ) {
+        if (c === '"') { if (text[i+1] === '"') { field += '"'; i++; } else inQ = false; }
+        else field += c;
+      } else {
+        if (c === '"') inQ = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+        else if (c === '\r') { /* skip */ }
+        else field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.length && !(r.length === 1 && r[0] === ''));
+  }
+
+  const cleanNum = (s) => Number((s || '').toString().replace(/[^0-9.\-]/g, '')) || 0;
+
+  // Apply a {fieldId: value} object to the form
+  function applyData(data, sourceLabel) {
+    let applied = 0;
+    FIELD_DEFS.forEach(f => {
+      if (data[f.id] !== undefined && data[f.id] !== '' && data[f.id] !== null) {
+        $(f.id).value = f.numeric ? cleanNum(data[f.id]) : data[f.id];
+        applied++;
+      }
+    });
+    renderReport(); saveReport();
+    showImportStatus(`✓ Imported ${applied} field(s) from ${sourceLabel}.`, true);
+  }
+
+  // Decide which CSV shape we have and extract data
+  function handleCSV(text) {
+    const rows = parseCSV(text);
+    if (!rows.length) { showImportStatus('Could not read any rows from this CSV.', false); return; }
+    const header = rows[0].map(h => h.trim().toLowerCase());
+
+    // Case A: our own "Field,Value" export
+    if (header[0] === 'field' && header[1] === 'value') {
+      const data = {};
+      rows.slice(1).forEach(r => {
+        const id = LABEL_TO_ID[(r[0] || '').trim().toLowerCase()];
+        if (id) data[id] = r[1];
+      });
+      applyData(data, 'CSV export');
+      return;
+    }
+
+    // Case B: raw ad-platform export — match columns by keyword, sum numeric rows
+    const colMap = {}; // fieldId -> column index
+    Object.entries(PLATFORM_COLS).forEach(([fid, keys]) => {
+      const idx = header.findIndex(h => keys.some(k => h === k || h.includes(k)));
+      if (idx !== -1) colMap[fid] = idx;
+    });
+    if (!Object.keys(colMap).length) {
+      showImportStatus('Unrecognized CSV. Expected our export or an ad-platform export with metric columns.', false);
+      return;
+    }
+    const totals = {};
+    rows.slice(1).forEach(r => {
+      Object.entries(colMap).forEach(([fid, idx]) => {
+        totals[fid] = (totals[fid] || 0) + cleanNum(r[idx]);
+      });
+    });
+    applyData(totals, 'ad-platform CSV (totals summed)');
+  }
+
+  // Read embedded data from one of our exported PDFs
+  async function handlePDF(arrayBuffer) {
+    if (!window.pdfjsLib) { showImportStatus('PDF reader not loaded — please retry.', false); return; }
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    try {
+      const doc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const meta = await doc.getMetadata();
+      const kw = (meta && meta.info && meta.info.Keywords) || '';
+      const marker = 'NXTGENDATA:';
+      const idx = kw.indexOf(marker);
+      if (idx === -1) {
+        showImportStatus('No embedded data found. Only PDFs exported by this app can be re-imported.', false);
+        return;
+      }
+      const data = JSON.parse(kw.slice(idx + marker.length));
+      applyData(data, 'PDF export');
+    } catch (e) {
+      showImportStatus('Failed to read PDF: ' + e.message, false);
+    }
+  }
+
+  // ---------- import wiring ----------
+  $('importBtn').addEventListener('click', () => $('importFile').click());
+  $('importFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const name = file.name.toLowerCase();
+    try {
+      if (name.endsWith('.csv')) {
+        handleCSV(await file.text());
+      } else if (name.endsWith('.pdf')) {
+        await handlePDF(await file.arrayBuffer());
+      } else {
+        showImportStatus('Unsupported file type. Please choose a .csv or .pdf file.', false);
+      }
+    } catch (err) {
+      showImportStatus('Import failed: ' + err.message, false);
+    }
+    e.target.value = ''; // allow re-importing the same file
   });
 
   // ============================================================
@@ -631,13 +825,13 @@
 
     clients.forEach((client) => {
       const card = document.createElement('div');
-      card.className = 'bg-navy2 rounded-2xl border border-navy3 p-5';
+      card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm p-5';
 
       // ---- progress bar segments ----
       const segs = PHASES.map((p, i) => {
         const done = phaseComplete(client, i);
         const current = client.phase === i;
-        let cls = 'bg-navy3';
+        let cls = 'bg-slate-200';
         if (done) cls = 'bg-green-500';
         else if (current) cls = 'bg-eblue';
         return `<div class="flex-1 h-2.5 rounded-full ${cls}" title="Phase ${i+1}: ${p.name}${done ? ' ✓' : ''}"></div>`;
@@ -652,7 +846,7 @@
           <input type="checkbox" data-cid="${client.id}" data-phase="${pi}" data-task="${ti}"
             ${client.checks[pi][ti] ? 'checked' : ''}
             class="task-check w-4 h-4 accent-eblue rounded" />
-          <span class="${client.checks[pi][ti] ? 'line-through text-slate-500' : 'text-slate-200'}">${t}</span>
+          <span class="${client.checks[pi][ti] ? 'line-through text-slate-400' : 'text-slate-700'}">${t}</span>
         </label>`).join('');
 
       const phaseDone = phaseComplete(client, pi);
@@ -660,16 +854,16 @@
       card.innerHTML = `
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h3 class="text-base font-bold text-white">${client.name}</h3>
-            <p class="text-xs text-slate-400">${client.contact ? '👤 ' + client.contact + ' · ' : ''}📅 ${client.date || '—'}</p>
+            <h3 class="text-base font-bold text-slate-900">${client.name}</h3>
+            <p class="text-xs text-slate-500">${client.contact ? '👤 ' + client.contact + ' · ' : ''}📅 ${client.date || '—'}</p>
           </div>
-          <button data-del="${client.id}" class="del-client text-slate-500 hover:text-red-400 text-sm">🗑️</button>
+          <button data-del="${client.id}" class="del-client text-slate-400 hover:text-red-500 text-sm">🗑️</button>
         </div>
 
         <div class="mt-4">
           <div class="flex items-center justify-between mb-1.5">
             <span class="field-label">Pipeline Progress</span>
-            <span class="text-xs text-slate-400">${completedCount}/11 phases complete</span>
+            <span class="text-xs text-slate-500">${completedCount}/11 phases complete</span>
           </div>
           <div class="flex gap-1">${segs}</div>
         </div>
@@ -679,11 +873,11 @@
             <label class="field-label">Current Phase</label>
             <select data-phasesel="${client.id}" class="inp mt-1 phase-select"></select>
           </div>
-          <div class="rounded-xl p-3 border ${phaseDone ? 'border-green-500' : 'border-navy3'}"
-               style="background:${phaseDone ? 'rgba(34,197,94,0.08)' : 'rgba(24,35,63,0.4)'};">
+          <div class="rounded-xl p-3 border ${phaseDone ? 'border-green-400' : 'border-slate-200'}"
+               style="background:${phaseDone ? 'rgba(34,197,94,0.08)' : '#f8fafc'};">
             <div class="flex items-center justify-between">
               <span class="field-label">Phase ${pi+1} Checklist</span>
-              <span class="text-xs font-semibold ${phaseDone ? 'text-green-400' : 'text-slate-400'}">${phaseDone ? '✓ Complete' : 'In progress'}</span>
+              <span class="text-xs font-semibold ${phaseDone ? 'text-green-600' : 'text-slate-400'}">${phaseDone ? '✓ Complete' : 'In progress'}</span>
             </div>
             <div class="mt-1">${tasks}</div>
           </div>
