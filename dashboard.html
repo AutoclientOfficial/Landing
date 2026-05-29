@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NXT-Gen Client Dashboard</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- jsPDF + html2canvas for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            navy:   '#0A0F1E',
+            navy2:  '#111a32',
+            navy3:  '#18233f',
+            eblue:  '#3B82F6',
+            eblue2: '#60A5FA',
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0A0F1E; }
+    ::-webkit-scrollbar-thumb { background: #3B82F6; border-radius: 4px; }
+    /* hide number input spinners */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    .tab-btn.active { background: #3B82F6; color: #fff; }
+    .field-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93a4c4; font-weight: 600; }
+    .inp {
+      background: #0A0F1E; border: 1px solid #2a3a5e; color: #fff;
+      border-radius: 0.5rem; padding: 0.55rem 0.75rem; width: 100%; outline: none;
+      transition: border-color .15s;
+    }
+    .inp:focus { border-color: #3B82F6; }
+    .inp:read-only { background: #0c1326; color: #60A5FA; font-weight: 700; }
+    @media print { .no-print { display: none !important; } }
+  </style>
+</head>
+
+<body class="bg-navy text-white min-h-screen flex flex-col">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="no-print border-b border-navy3 bg-navy2/60 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Logo placeholder: NXT-Gen Hex -->
+        <div class="w-11 h-11 flex items-center justify-center relative">
+          <svg viewBox="0 0 100 100" class="w-11 h-11">
+            <polygon points="50,4 91,27 91,73 50,96 9,73 9,27"
+                     fill="none" stroke="#3B82F6" stroke-width="6"/>
+            <polygon points="50,22 75,36 75,64 50,78 25,64 25,36"
+                     fill="#3B82F6" opacity="0.18"/>
+          </svg>
+          <span class="absolute text-eblue2 font-black text-sm">NG</span>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-extrabold leading-tight">NXT-Gen <span class="text-eblue">Client Dashboard</span></h1>
+          <p class="text-[11px] text-slate-400 -mt-0.5">Digital Marketing Agency · Philippines</p>
+        </div>
+      </div>
+      <nav class="flex gap-2">
+        <button data-tab="report" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-navy3 text-slate-300 transition">
+          📊 <span class="hidden sm:inline">Report Generator</span><span class="sm:hidden">Report</span>
+        </button>
+        <button data-tab="pipeline" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-navy3 text-slate-300 transition">
+          🚀 <span class="hidden sm:inline">Pipeline Tracker</span><span class="sm:hidden">Pipeline</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- ===================== SECTION 1: REPORT GENERATOR ===================== -->
+    <section id="tab-report">
+      <div class="grid lg:grid-cols-2 gap-6">
+
+        <!-- ---------- INPUT FORM ---------- -->
+        <div class="no-print bg-navy2 rounded-2xl border border-navy3 p-5">
+          <h2 class="text-lg font-bold mb-4 flex items-center gap-2">📝 Report Inputs</h2>
+          <form id="reportForm" class="space-y-4">
+            <div>
+              <label class="field-label">Client Name</label>
+              <input id="r_client" class="inp mt-1" placeholder="e.g. Juan's Lechon Manok" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="field-label">Report Month</label>
+                <select id="r_month" class="inp mt-1"></select>
+              </div>
+              <div>
+                <label class="field-label">Report Year</label>
+                <input id="r_year" type="number" class="inp mt-1" placeholder="2026" />
+              </div>
+            </div>
+
+            <div>
+              <label class="field-label">Ad Platform</label>
+              <select id="r_platform" class="inp mt-1">
+                <option>Facebook Ads</option>
+                <option>Google Ads</option>
+                <option>TikTok Ads</option>
+                <option>All</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="field-label">Total Ad Spend (₱)</label>
+                <input id="r_spend" type="number" min="0" step="0.01" class="inp mt-1" placeholder="0" />
+              </div>
+              <div>
+                <label class="field-label">Total Revenue (₱)</label>
+                <input id="r_revenue" type="number" min="0" step="0.01" class="inp mt-1" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="field-label">Total Reach</label>
+                <input id="r_reach" type="number" min="0" class="inp mt-1" placeholder="0" />
+              </div>
+              <div>
+                <label class="field-label">Total Impressions</label>
+                <input id="r_impressions" type="number" min="0" class="inp mt-1" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="field-label">Total Link Clicks</label>
+                <input id="r_clicks" type="number" min="0" class="inp mt-1" placeholder="0" />
+              </div>
+              <div>
+                <label class="field-label">Total Leads Generated</label>
+                <input id="r_leads" type="number" min="0" class="inp mt-1" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="field-label">Cost Per Lead (auto)</label>
+                <input id="r_cpl" class="inp mt-1" readonly value="₱0.00" />
+              </div>
+              <div>
+                <label class="field-label">ROAS (auto)</label>
+                <input id="r_roas" class="inp mt-1" readonly value="0.00x" />
+              </div>
+            </div>
+
+            <div>
+              <label class="field-label">Top Performing Content</label>
+              <input id="r_topcontent" class="inp mt-1" placeholder="e.g. Carousel ad — 'Summer Sale'" />
+            </div>
+
+            <div>
+              <label class="field-label">Recommendations for Next Month</label>
+              <textarea id="r_recommend" rows="3" class="inp mt-1" placeholder="Strategy suggestions..."></textarea>
+            </div>
+
+            <div>
+              <label class="field-label">Agency Notes</label>
+              <textarea id="r_notes" rows="2" class="inp mt-1" placeholder="Internal notes..."></textarea>
+            </div>
+          </form>
+        </div>
+
+        <!-- ---------- REPORT PREVIEW ---------- -->
+        <div>
+          <div class="no-print flex items-center justify-between mb-3">
+            <h2 class="text-lg font-bold flex items-center gap-2">👁️ Live Preview</h2>
+            <button id="downloadPdf" class="bg-eblue hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+              ⬇️ Download as PDF
+            </button>
+          </div>
+
+          <!-- This whole block is what gets exported -->
+          <div id="reportCanvas" class="bg-navy2 rounded-2xl border border-navy3 p-6" style="background:#0A0F1E;">
+            <!-- report header -->
+            <div class="flex items-center justify-between pb-4 border-b border-navy3">
+              <div class="flex items-center gap-3">
+                <svg viewBox="0 0 100 100" class="w-10 h-10">
+                  <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#3B82F6" stroke-width="6"/>
+                  <polygon points="50,22 75,36 75,64 50,78 25,64 25,36" fill="#3B82F6" opacity="0.25"/>
+                </svg>
+                <div>
+                  <p class="text-eblue font-black text-sm tracking-wide">NXT-GEN HEX</p>
+                  <p class="text-[10px] text-slate-400">Marketing Performance Report</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p id="p_client" class="text-xl font-extrabold text-white">—</p>
+                <p id="p_period" class="text-xs text-slate-400">—</p>
+                <p id="p_platform" class="text-[11px] text-eblue2 font-semibold mt-0.5">—</p>
+              </div>
+            </div>
+
+            <!-- highlighted hero metrics: ROAS & CPL -->
+            <div class="grid grid-cols-2 gap-4 mt-5">
+              <div id="hero_roas" class="rounded-xl p-4 border" style="background:#0c1326;border-color:#2a3a5e;">
+                <p class="field-label">Return On Ad Spend</p>
+                <p id="p_roas" class="text-4xl font-black mt-1">0.00x</p>
+                <p id="p_roas_tag" class="text-xs font-semibold mt-1">—</p>
+              </div>
+              <div id="hero_cpl" class="rounded-xl p-4 border" style="background:#0c1326;border-color:#2a3a5e;">
+                <p class="field-label">Cost Per Lead</p>
+                <p id="p_cpl" class="text-4xl font-black mt-1">₱0.00</p>
+                <p id="p_cpl_tag" class="text-xs font-semibold mt-1">—</p>
+              </div>
+            </div>
+
+            <!-- money cards -->
+            <div class="grid grid-cols-2 gap-4 mt-4">
+              <div class="rounded-xl p-4 bg-navy3/60 border border-navy3">
+                <p class="field-label">Total Ad Spend</p>
+                <p id="p_spend" class="text-2xl font-black text-white mt-1">₱0</p>
+              </div>
+              <div class="rounded-xl p-4 bg-navy3/60 border border-navy3">
+                <p class="field-label">Total Revenue</p>
+                <p id="p_revenue" class="text-2xl font-black text-eblue2 mt-1">₱0</p>
+              </div>
+            </div>
+
+            <!-- funnel metric cards -->
+            <div class="grid grid-cols-4 gap-3 mt-4">
+              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+                <p class="field-label">Reach</p>
+                <p id="p_reach" class="text-xl font-black text-white mt-1">0</p>
+              </div>
+              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+                <p class="field-label">Impressions</p>
+                <p id="p_impressions" class="text-xl font-black text-white mt-1">0</p>
+              </div>
+              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+                <p class="field-label">Clicks</p>
+                <p id="p_clicks" class="text-xl font-black text-white mt-1">0</p>
+              </div>
+              <div class="rounded-xl p-3 bg-navy3/40 border border-navy3 text-center">
+                <p class="field-label">Leads</p>
+                <p id="p_leads" class="text-xl font-black text-white mt-1">0</p>
+              </div>
+            </div>
+
+            <!-- chart -->
+            <div class="rounded-xl p-4 bg-navy3/40 border border-navy3 mt-4">
+              <p class="field-label mb-2">Funnel Performance</p>
+              <div style="height:240px;"><canvas id="funnelChart"></canvas></div>
+            </div>
+
+            <!-- top content -->
+            <div class="rounded-xl p-4 bg-navy3/40 border border-navy3 mt-4">
+              <p class="field-label">🏆 Top Performing Content</p>
+              <p id="p_topcontent" class="text-sm text-white mt-1">—</p>
+            </div>
+
+            <!-- recommendations + notes -->
+            <div class="grid sm:grid-cols-2 gap-4 mt-4">
+              <div class="rounded-xl p-4 border" style="background:#0c1326;border-color:#3B82F6;">
+                <p class="field-label text-eblue2">📈 Recommendations · Next Month</p>
+                <p id="p_recommend" class="text-sm text-slate-200 mt-1 whitespace-pre-wrap">—</p>
+              </div>
+              <div class="rounded-xl p-4 bg-navy3/40 border border-navy3">
+                <p class="field-label">🗒️ Agency Notes</p>
+                <p id="p_notes" class="text-sm text-slate-300 mt-1 whitespace-pre-wrap">—</p>
+              </div>
+            </div>
+
+            <div class="text-center text-[10px] text-slate-500 mt-5 pt-3 border-t border-navy3">
+              NXT-Gen Hex | Powered by NextGen Capital · Generated <span id="p_gendate"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 2: PIPELINE TRACKER ===================== -->
+    <section id="tab-pipeline" class="hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h2 class="text-lg font-bold">🚀 Client Pipeline Tracker</h2>
+          <p class="text-sm text-slate-400">FBPH sales process · 11 phases · <span id="clientCount">0</span> client(s)</p>
+        </div>
+        <button id="addClientBtn" class="bg-eblue hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+          ➕ Add New Client
+        </button>
+      </div>
+
+      <div id="clientList" class="space-y-4"></div>
+      <div id="emptyState" class="text-center py-16 text-slate-500">
+        <p class="text-5xl mb-3">📭</p>
+        <p>No clients yet. Click <span class="text-eblue font-semibold">"Add New Client"</span> to begin.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="no-print border-t border-navy3 bg-navy2/60 mt-6">
+    <div class="max-w-7xl mx-auto px-4 py-4 text-center text-xs text-slate-400">
+      <span class="text-eblue2 font-bold">NXT-Gen Hex</span> | Powered by <span class="font-semibold text-slate-300">NextGen Capital</span>
+    </div>
+  </footer>
+
+  <!-- ===================== ADD CLIENT MODAL ===================== -->
+  <div id="clientModal" class="no-print hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+    <div class="bg-navy2 border border-navy3 rounded-2xl w-full max-w-md p-6">
+      <h3 class="text-lg font-bold mb-4">➕ Add New Client</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="field-label">Client / Business Name</label>
+          <input id="c_name" class="inp mt-1" placeholder="e.g. Manila Coffee Co." />
+        </div>
+        <div>
+          <label class="field-label">Contact Person</label>
+          <input id="c_contact" class="inp mt-1" placeholder="e.g. Maria Santos" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="field-label">Date Added</label>
+            <input id="c_date" type="date" class="inp mt-1" />
+          </div>
+          <div>
+            <label class="field-label">Starting Phase</label>
+            <select id="c_phase" class="inp mt-1"></select>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button id="cancelClient" class="flex-1 bg-navy3 hover:bg-navy3/70 text-slate-200 font-semibold py-2 rounded-lg transition">Cancel</button>
+        <button id="saveClient" class="flex-1 bg-eblue hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition">Save Client</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ============================================================
+  //  CONSTANTS
+  // ============================================================
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // 11 FBPH phases, each with a default sub-task checklist
+  const PHASES = [
+    { name: 'Lead Generation & Outreach', tasks: ['Identify target prospect', 'Initial outreach message sent', 'Follow-up sequence started'] },
+    { name: 'Pre-Qualification',          tasks: ['Budget confirmed', 'Decision-maker identified', 'Pain points noted'] },
+    { name: 'Google Form Application',    tasks: ['Form link sent', 'Application submitted', 'Responses reviewed'] },
+    { name: 'Discovery Call',             tasks: ['Call scheduled', 'Call completed', 'Needs documented'] },
+    { name: 'Client Presentation',        tasks: ['Proposal prepared', 'Presentation delivered', 'Questions addressed'] },
+    { name: 'Onboarding',                 tasks: ['Contract signed', 'Payment received', 'Accounts collected'] },
+    { name: 'Welcome & Alignment',        tasks: ['Welcome kit sent', 'Kickoff meeting done', 'Goals aligned'] },
+    { name: 'Execution',                  tasks: ['Campaign built', 'Creatives approved', 'Ads launched'] },
+    { name: 'CAC Matching',               tasks: ['CAC calculated', 'Budget vs CAC reviewed', 'Targets adjusted'] },
+    { name: 'Closing & Documentation',    tasks: ['Results compiled', 'Report delivered', 'Invoice settled'] },
+    { name: 'Handover & Monitoring',      tasks: ['Assets handed over', 'Monitoring schedule set', 'Retention plan agreed'] },
+  ];
+
+  const peso = (n) => '₱' + (Number(n) || 0).toLocaleString('en-PH', { maximumFractionDigits: 2 });
+  const num  = (n) => (Number(n) || 0).toLocaleString('en-PH');
+  const $ = (id) => document.getElementById(id);
+
+  // ============================================================
+  //  TAB SWITCHING
+  // ============================================================
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      $('tab-report').classList.toggle('hidden', tab !== 'report');
+      $('tab-pipeline').classList.toggle('hidden', tab !== 'pipeline');
+    });
+  });
+
+  // ============================================================
+  //  SECTION 1 — REPORT GENERATOR
+  // ============================================================
+  const reportFields = ['r_client','r_month','r_year','r_platform','r_spend','r_revenue','r_reach','r_impressions','r_clicks','r_leads','r_topcontent','r_recommend','r_notes'];
+  let funnelChart = null;
+
+  // populate month dropdown
+  MONTHS.forEach((m, i) => {
+    const o = document.createElement('option'); o.value = m; o.textContent = m; $('r_month').appendChild(o);
+  });
+
+  function getReportData() {
+    const d = {};
+    reportFields.forEach(f => d[f] = $(f).value);
+    return d;
+  }
+
+  function saveReport() {
+    localStorage.setItem('nxtgen_report', JSON.stringify(getReportData()));
+  }
+
+  function loadReport() {
+    const raw = localStorage.getItem('nxtgen_report');
+    const now = new Date();
+    if (raw) {
+      const d = JSON.parse(raw);
+      reportFields.forEach(f => { if (d[f] !== undefined) $(f).value = d[f]; });
+    } else {
+      $('r_month').value = MONTHS[now.getMonth()];
+      $('r_year').value  = now.getFullYear();
+    }
+  }
+
+  // color thresholds -> returns {color, bg, label}
+  function roasStatus(roas) {
+    if (roas >= 3)   return { color:'#22c55e', label:'Excellent' };
+    if (roas >= 1.5) return { color:'#eab308', label:'Okay' };
+    return { color:'#ef4444', label:'Needs Attention' };
+  }
+  function cplStatus(cpl, hasLeads) {
+    if (!hasLeads)    return { color:'#64748b', label:'No leads yet' };
+    if (cpl <= 200)   return { color:'#22c55e', label:'Excellent' };
+    if (cpl <= 500)   return { color:'#eab308', label:'Okay' };
+    return { color:'#ef4444', label:'Needs Attention' };
+  }
+
+  function renderReport() {
+    const d = getReportData();
+    const spend = Number(d.r_spend) || 0;
+    const revenue = Number(d.r_revenue) || 0;
+    const leads = Number(d.r_leads) || 0;
+    const reach = Number(d.r_reach) || 0;
+    const impressions = Number(d.r_impressions) || 0;
+    const clicks = Number(d.r_clicks) || 0;
+
+    const cpl  = leads > 0 ? spend / leads : 0;
+    const roas = spend > 0 ? revenue / spend : 0;
+
+    // auto-calc fields in the form
+    $('r_cpl').value  = peso(cpl);
+    $('r_roas').value = roas.toFixed(2) + 'x';
+
+    // header
+    $('p_client').textContent   = d.r_client || 'Client Name';
+    $('p_period').textContent   = (d.r_month || '—') + ' ' + (d.r_year || '');
+    $('p_platform').textContent = d.r_platform || '—';
+
+    // hero metrics + color coding
+    const rs = roasStatus(roas);
+    $('p_roas').textContent = roas.toFixed(2) + 'x';
+    $('p_roas').style.color = rs.color;
+    $('p_roas_tag').textContent = rs.label;
+    $('p_roas_tag').style.color = rs.color;
+    $('hero_roas').style.borderColor = rs.color;
+
+    const cs = cplStatus(cpl, leads > 0);
+    $('p_cpl').textContent = peso(cpl);
+    $('p_cpl').style.color = cs.color;
+    $('p_cpl_tag').textContent = cs.label;
+    $('p_cpl_tag').style.color = cs.color;
+    $('hero_cpl').style.borderColor = cs.color;
+
+    // money + funnel cards
+    $('p_spend').textContent       = peso(spend);
+    $('p_revenue').textContent     = peso(revenue);
+    $('p_reach').textContent       = num(reach);
+    $('p_impressions').textContent = num(impressions);
+    $('p_clicks').textContent      = num(clicks);
+    $('p_leads').textContent       = num(leads);
+
+    // text blocks
+    $('p_topcontent').textContent = d.r_topcontent || '—';
+    $('p_recommend').textContent  = d.r_recommend || '—';
+    $('p_notes').textContent      = d.r_notes || '—';
+    $('p_gendate').textContent    = new Date().toLocaleDateString('en-PH');
+
+    // chart
+    const data = [reach, impressions, clicks, leads];
+    if (funnelChart) {
+      funnelChart.data.datasets[0].data = data;
+      funnelChart.update();
+    } else {
+      funnelChart = new Chart($('funnelChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Reach','Impressions','Clicks','Leads'],
+          datasets: [{
+            label: 'Funnel',
+            data: data,
+            backgroundColor: ['#1d4ed8','#3B82F6','#60A5FA','#93c5fd'],
+            borderRadius: 6,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 300 },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#93a4c4' }, grid: { display: false } },
+            y: { ticks: { color: '#93a4c4' }, grid: { color: '#1e293b' }, beginAtZero: true },
+          },
+        },
+      });
+    }
+  }
+
+  // live update on any input
+  reportFields.forEach(f => {
+    $(f).addEventListener('input', () => { renderReport(); saveReport(); });
+    $(f).addEventListener('change', () => { renderReport(); saveReport(); });
+  });
+
+  // ---------- PDF export ----------
+  $('downloadPdf').addEventListener('click', async () => {
+    const btn = $('downloadPdf');
+    const orig = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '⏳ Generating...';
+    try {
+      const el = $('reportCanvas');
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0A0F1E', useCORS: true });
+      const img = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgW = pageW;
+      const imgH = (canvas.height * imgW) / canvas.width;
+      let heightLeft = imgH;
+      let position = 0;
+      pdf.addImage(img, 'PNG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+      while (heightLeft > 0) {
+        position -= pageH;
+        pdf.addPage();
+        pdf.addImage(img, 'PNG', 0, position, imgW, imgH);
+        heightLeft -= pageH;
+      }
+      const d = getReportData();
+      const safe = (s) => (s || 'report').replace(/[^a-z0-9]+/gi, '-');
+      pdf.save(`${safe(d.r_client)}-${safe(d.r_month)}-${d.r_year || ''}.pdf`);
+    } catch (e) {
+      alert('PDF generation failed: ' + e.message);
+    } finally {
+      btn.disabled = false; btn.innerHTML = orig;
+    }
+  });
+
+  // ============================================================
+  //  SECTION 2 — CLIENT PIPELINE TRACKER
+  // ============================================================
+  let clients = [];
+
+  function loadClients() {
+    const raw = localStorage.getItem('nxtgen_clients');
+    clients = raw ? JSON.parse(raw) : [];
+  }
+  function saveClients() {
+    localStorage.setItem('nxtgen_clients', JSON.stringify(clients));
+  }
+
+  // build a fresh checklist-state structure: array(11) of array(bool)
+  function freshChecklist() {
+    return PHASES.map(p => p.tasks.map(() => false));
+  }
+
+  function phaseComplete(client, phaseIdx) {
+    const arr = client.checks[phaseIdx];
+    return arr.length > 0 && arr.every(Boolean);
+  }
+
+  // populate phase dropdowns (modal + per-client)
+  function fillPhaseSelect(sel) {
+    sel.innerHTML = '';
+    PHASES.forEach((p, i) => {
+      const o = document.createElement('option');
+      o.value = i; o.textContent = `Phase ${i+1}: ${p.name}`;
+      sel.appendChild(o);
+    });
+  }
+
+  // ---------- modal ----------
+  const modal = $('clientModal');
+  fillPhaseSelect($('c_phase'));
+
+  $('addClientBtn').addEventListener('click', () => {
+    $('c_name').value = ''; $('c_contact').value = '';
+    $('c_date').value = new Date().toISOString().slice(0,10);
+    $('c_phase').value = 0;
+    modal.classList.remove('hidden');
+  });
+  $('cancelClient').addEventListener('click', () => modal.classList.add('hidden'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+
+  $('saveClient').addEventListener('click', () => {
+    const name = $('c_name').value.trim();
+    if (!name) { alert('Please enter a client / business name.'); return; }
+    clients.push({
+      id: Date.now(),
+      name,
+      contact: $('c_contact').value.trim(),
+      date: $('c_date').value,
+      phase: Number($('c_phase').value),
+      checks: freshChecklist(),
+    });
+    saveClients();
+    renderClients();
+    modal.classList.add('hidden');
+  });
+
+  // ---------- render ----------
+  function renderClients() {
+    const list = $('clientList');
+    list.innerHTML = '';
+    $('clientCount').textContent = clients.length;
+    $('emptyState').classList.toggle('hidden', clients.length > 0);
+
+    clients.forEach((client) => {
+      const card = document.createElement('div');
+      card.className = 'bg-navy2 rounded-2xl border border-navy3 p-5';
+
+      // ---- progress bar segments ----
+      const segs = PHASES.map((p, i) => {
+        const done = phaseComplete(client, i);
+        const current = client.phase === i;
+        let cls = 'bg-navy3';
+        if (done) cls = 'bg-green-500';
+        else if (current) cls = 'bg-eblue';
+        return `<div class="flex-1 h-2.5 rounded-full ${cls}" title="Phase ${i+1}: ${p.name}${done ? ' ✓' : ''}"></div>`;
+      }).join('');
+
+      const completedCount = PHASES.filter((p,i)=>phaseComplete(client,i)).length;
+
+      // ---- current-phase checklist ----
+      const pi = client.phase;
+      const tasks = PHASES[pi].tasks.map((t, ti) => `
+        <label class="flex items-center gap-2 text-sm py-1 cursor-pointer">
+          <input type="checkbox" data-cid="${client.id}" data-phase="${pi}" data-task="${ti}"
+            ${client.checks[pi][ti] ? 'checked' : ''}
+            class="task-check w-4 h-4 accent-eblue rounded" />
+          <span class="${client.checks[pi][ti] ? 'line-through text-slate-500' : 'text-slate-200'}">${t}</span>
+        </label>`).join('');
+
+      const phaseDone = phaseComplete(client, pi);
+
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-white">${client.name}</h3>
+            <p class="text-xs text-slate-400">${client.contact ? '👤 ' + client.contact + ' · ' : ''}📅 ${client.date || '—'}</p>
+          </div>
+          <button data-del="${client.id}" class="del-client text-slate-500 hover:text-red-400 text-sm">🗑️</button>
+        </div>
+
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="field-label">Pipeline Progress</span>
+            <span class="text-xs text-slate-400">${completedCount}/11 phases complete</span>
+          </div>
+          <div class="flex gap-1">${segs}</div>
+        </div>
+
+        <div class="mt-4 grid sm:grid-cols-2 gap-4 items-start">
+          <div>
+            <label class="field-label">Current Phase</label>
+            <select data-phasesel="${client.id}" class="inp mt-1 phase-select"></select>
+          </div>
+          <div class="rounded-xl p-3 border ${phaseDone ? 'border-green-500' : 'border-navy3'}"
+               style="background:${phaseDone ? 'rgba(34,197,94,0.08)' : 'rgba(24,35,63,0.4)'};">
+            <div class="flex items-center justify-between">
+              <span class="field-label">Phase ${pi+1} Checklist</span>
+              <span class="text-xs font-semibold ${phaseDone ? 'text-green-400' : 'text-slate-400'}">${phaseDone ? '✓ Complete' : 'In progress'}</span>
+            </div>
+            <div class="mt-1">${tasks}</div>
+          </div>
+        </div>`;
+
+      list.appendChild(card);
+
+      // set current phase dropdown value
+      const sel = card.querySelector('.phase-select');
+      fillPhaseSelect(sel);
+      sel.value = client.phase;
+    });
+
+    // wire events
+    list.querySelectorAll('.task-check').forEach(chk => {
+      chk.addEventListener('change', () => {
+        const c = clients.find(x => x.id === Number(chk.dataset.cid));
+        c.checks[Number(chk.dataset.phase)][Number(chk.dataset.task)] = chk.checked;
+        saveClients(); renderClients();
+      });
+    });
+    list.querySelectorAll('.phase-select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const c = clients.find(x => x.id === Number(sel.dataset.phasesel));
+        c.phase = Number(sel.value);
+        saveClients(); renderClients();
+      });
+    });
+    list.querySelectorAll('.del-client').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (confirm('Delete this client?')) {
+          clients = clients.filter(x => x.id !== Number(btn.dataset.del));
+          saveClients(); renderClients();
+        }
+      });
+    });
+  }
+
+  // ============================================================
+  //  INIT
+  // ============================================================
+  loadReport();
+  renderReport();
+  loadClients();
+  renderClients();
+  </script>
+</body>
+</html>
