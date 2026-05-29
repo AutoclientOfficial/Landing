@@ -60,6 +60,57 @@
 
 <body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col">
 
+  <!-- ===================== LOGIN GATE ===================== -->
+  <div id="authScreen" class="fixed inset-0 z-[100] bg-slate-100 flex items-center justify-center p-4">
+    <!-- soft brand backdrop -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(59,130,246,0.12),transparent 70%)"></div>
+      <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(37,99,235,0.10),transparent 70%)"></div>
+    </div>
+
+    <div class="relative bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-sm p-8">
+      <div class="flex flex-col items-center text-center">
+        <svg viewBox="0 0 100 100" class="w-14 h-14">
+          <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#3B82F6" stroke-width="6"/>
+          <polygon points="50,22 75,36 75,64 50,78 25,64 25,36" fill="#3B82F6" opacity="0.18"/>
+        </svg>
+        <h1 class="text-xl font-extrabold mt-3">NXT-Gen <span class="text-eblue">Dashboard</span></h1>
+        <p id="authSubtitle" class="text-xs text-slate-500 mt-1">Sign in to continue</p>
+      </div>
+
+      <form id="authForm" class="space-y-4 mt-6">
+        <div>
+          <label class="field-label">Username</label>
+          <input id="auth_user" autocomplete="username" class="inp mt-1" placeholder="username" />
+        </div>
+        <div>
+          <label class="field-label">Password</label>
+          <input id="auth_pass" type="password" autocomplete="current-password" class="inp mt-1" placeholder="••••••••" />
+        </div>
+        <div id="auth_confirm_wrap" class="hidden">
+          <label class="field-label">Confirm Password</label>
+          <input id="auth_confirm" type="password" autocomplete="new-password" class="inp mt-1" placeholder="••••••••" />
+        </div>
+
+        <p id="authError" class="hidden text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></p>
+
+        <button id="authSubmit" type="submit" class="w-full bg-eblue hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg transition shadow-sm">
+          Sign In
+        </button>
+      </form>
+
+      <div class="flex items-center justify-between mt-4">
+        <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+          <input id="auth_remember" type="checkbox" class="w-3.5 h-3.5 accent-eblue" /> Keep me signed in
+        </label>
+        <button id="authReset" class="text-xs text-slate-400 hover:text-eblue transition">Reset login</button>
+      </div>
+
+      <p class="text-[10px] text-slate-400 text-center mt-6">NXT-Gen Hex | Powered by NextGen Capital</p>
+    </div>
+  </div>
+
+
   <!-- ===================== HEADER ===================== -->
   <header class="no-print border-b border-slate-200 bg-white/80 backdrop-blur sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -85,6 +136,11 @@
         </button>
         <button data-tab="pipeline" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 transition">
           🚀 <span class="hidden sm:inline">Pipeline Tracker</span><span class="sm:hidden">Pipeline</span>
+        </button>
+        <div class="w-px bg-slate-200 mx-1 hidden sm:block"></div>
+        <span id="authWho" class="hidden sm:flex items-center text-xs text-slate-500 font-medium px-1"></span>
+        <button id="logoutBtn" class="px-3 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition" title="Log out">
+          ⏻ <span class="hidden sm:inline">Logout</span>
         </button>
       </nav>
     </div>
@@ -364,6 +420,109 @@
   </div>
 
   <script>
+  // ============================================================
+  //  AUTH (client-side gate — not server-grade security)
+  // ============================================================
+  const AUTH_KEY = 'nxtgen_auth';        // stored {user, hash}
+  const SESSION_KEY = 'nxtgen_session';  // active session flag
+
+  const byId = (id) => document.getElementById(id);
+
+  // SHA-256 with a non-crypto fallback for non-secure contexts (e.g. file://)
+  async function hashPw(s) {
+    if (window.crypto && crypto.subtle) {
+      try {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+        return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) { /* fall through */ }
+    }
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) { h = ((h << 5) + h) + s.charCodeAt(i); h |= 0; }
+    return 'fb' + (h >>> 0).toString(16);
+  }
+
+  const getAuth = () => { const r = localStorage.getItem(AUTH_KEY); return r ? JSON.parse(r) : null; };
+
+  let authSetupMode = false;
+
+  function authError(msg) {
+    const el = byId('authError');
+    if (!msg) { el.classList.add('hidden'); return; }
+    el.textContent = msg; el.classList.remove('hidden');
+  }
+
+  function lockApp() {
+    byId('authScreen').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    byId('auth_user').focus();
+  }
+  function unlockApp() {
+    byId('authScreen').classList.add('hidden');
+    document.body.style.overflow = '';
+    const auth = getAuth();
+    byId('authWho').textContent = auth ? '👤 ' + auth.user : '';
+  }
+
+  function configureAuthScreen() {
+    const auth = getAuth();
+    authSetupMode = !auth;
+    byId('auth_confirm_wrap').classList.toggle('hidden', !authSetupMode);
+    byId('authSubtitle').textContent = authSetupMode
+      ? 'First-time setup — create your team login'
+      : 'Sign in to continue';
+    byId('authSubmit').textContent = authSetupMode ? 'Create Login' : 'Sign In';
+    byId('auth_user').value = '';
+    byId('auth_pass').value = '';
+    byId('auth_confirm').value = '';
+    authError('');
+  }
+
+  byId('authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = byId('auth_user').value.trim();
+    const pass = byId('auth_pass').value;
+    if (!user || !pass) { authError('Please enter a username and password.'); return; }
+
+    if (authSetupMode) {
+      const confirm = byId('auth_confirm').value;
+      if (pass.length < 4) { authError('Password must be at least 4 characters.'); return; }
+      if (pass !== confirm) { authError('Passwords do not match.'); return; }
+      localStorage.setItem(AUTH_KEY, JSON.stringify({ user, hash: await hashPw(pass) }));
+    } else {
+      const auth = getAuth();
+      if (user !== auth.user || (await hashPw(pass)) !== auth.hash) {
+        authError('Incorrect username or password.'); return;
+      }
+    }
+    // success
+    const store = byId('auth_remember').checked ? localStorage : sessionStorage;
+    store.setItem(SESSION_KEY, '1');
+    unlockApp();
+  });
+
+  byId('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+    configureAuthScreen();
+    lockApp();
+  });
+
+  byId('authReset').addEventListener('click', () => {
+    if (confirm('Reset the saved login? You will need to create a new username and password. (Report and client data are kept.)')) {
+      localStorage.removeItem(AUTH_KEY);
+      localStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(SESSION_KEY);
+      configureAuthScreen();
+    }
+  });
+
+  function initAuth() {
+    const loggedIn = localStorage.getItem(SESSION_KEY) === '1' || sessionStorage.getItem(SESSION_KEY) === '1';
+    if (loggedIn && getAuth()) { unlockApp(); return; }
+    configureAuthScreen();
+    lockApp();
+  }
+
   // ============================================================
   //  CONSTANTS
   // ============================================================
@@ -919,6 +1078,7 @@
   // ============================================================
   //  INIT
   // ============================================================
+  initAuth();
   loadReport();
   renderReport();
   loadClients();
