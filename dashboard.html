@@ -105,7 +105,20 @@
         <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
           <input id="auth_remember" type="checkbox" class="w-3.5 h-3.5 accent-eblue" /> Keep me signed in
         </label>
-        <button id="authReset" class="text-xs text-slate-400 hover:text-eblue transition">Reset login</button>
+        <button id="authForgot" class="text-xs text-slate-400 hover:text-eblue transition">Forgot password?</button>
+      </div>
+
+      <!-- Forgot password panel (holds the reset option) -->
+      <div id="forgotPanel" class="hidden mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
+        <p class="text-xs font-semibold text-slate-700">Forgot password?</p>
+        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+          Passwords are stored only on this device and can't be recovered. You can reset the login and create a
+          new username &amp; password. Your report, client and creative data are kept.
+        </p>
+        <div class="flex gap-2 mt-3">
+          <button id="forgotCancel" class="flex-1 bg-white border border-slate-300 hover:bg-slate-100 text-slate-600 text-xs font-semibold py-2 rounded-lg transition">Cancel</button>
+          <button id="authReset" class="flex-1 bg-gold hover:bg-goldDk text-navy text-xs font-semibold py-2 rounded-lg transition">Reset login</button>
+        </div>
       </div>
 
       <p class="text-[10px] text-slate-400 text-center mt-6">NXT-Gen Hex | Powered by NextGen Capital</p>
@@ -505,8 +518,15 @@
     byId('auth_user').value = '';
     byId('auth_pass').value = '';
     byId('auth_confirm').value = '';
+    // "Forgot password?" only applies once an account exists
+    byId('authForgot').classList.toggle('hidden', authSetupMode);
+    byId('forgotPanel').classList.add('hidden');
     authError('');
   }
+
+  // toggle the forgot-password panel (which holds the reset option)
+  byId('authForgot').addEventListener('click', () => byId('forgotPanel').classList.toggle('hidden'));
+  byId('forgotCancel').addEventListener('click', () => byId('forgotPanel').classList.add('hidden'));
 
   byId('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
