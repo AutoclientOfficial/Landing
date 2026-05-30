@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NXT-Gen Client Dashboard</title>
+  <title>Franchise Brokerage PH</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,8 +20,10 @@
       theme: {
         extend: {
           colors: {
-            eblue:  '#3B82F6',
-            eblue2: '#2563EB',
+            gold:   '#C9A84C',
+            goldDk: '#A9883A',
+            eblue:  '#9A7B2E',
+            eblue2: '#7E641F',
             navy:   '#0A0F1E',
           },
           fontFamily: {
@@ -40,20 +42,20 @@
     body { font-family: 'Inter', sans-serif; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #eef2f9; }
-    ::-webkit-scrollbar-thumb { background: #3B82F6; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 4px; }
     /* hide number input spinners */
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
-    .tab-btn.active { background: #3B82F6; color: #fff; }
+    .tab-btn.active { background: #C9A84C; color: #0A0F1E; }
     .field-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; }
     .inp {
       background: #ffffff; border: 1px solid #d8dee9; color: #0f172a;
       border-radius: 0.5rem; padding: 0.55rem 0.75rem; width: 100%; outline: none;
       transition: border-color .15s;
     }
-    .inp:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
-    .inp:read-only { background: #f1f5fd; color: #2563EB; font-weight: 700; }
+    .inp:focus { border-color: #C9A84C; box-shadow: 0 0 0 3px rgba(201,168,76,0.18); }
+    .inp:read-only { background: #fbf6e9; color: #9A7B2E; font-weight: 700; }
     @media print { .no-print { display: none !important; } }
   </style>
 </head>
@@ -64,17 +66,17 @@
   <div id="authScreen" class="fixed inset-0 z-[100] bg-slate-100 flex items-center justify-center p-4">
     <!-- soft brand backdrop -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(59,130,246,0.12),transparent 70%)"></div>
-      <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(37,99,235,0.10),transparent 70%)"></div>
+      <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(201,168,76,0.18),transparent 70%)"></div>
+      <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(169,136,58,0.14),transparent 70%)"></div>
     </div>
 
     <div class="relative bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-sm p-8">
       <div class="flex flex-col items-center text-center">
         <svg viewBox="0 0 100 100" class="w-14 h-14">
-          <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#3B82F6" stroke-width="6"/>
-          <polygon points="50,22 75,36 75,64 50,78 25,64 25,36" fill="#3B82F6" opacity="0.18"/>
+          <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#C9A84C" stroke-width="6"/>
+          <polygon points="50,22 75,36 75,64 50,78 25,64 25,36" fill="#C9A84C" opacity="0.18"/>
         </svg>
-        <h1 class="text-xl font-extrabold mt-3">NXT-Gen <span class="text-eblue">Dashboard</span></h1>
+        <h1 class="text-xl font-extrabold mt-3">Franchise Brokerage <span class="text-eblue">PH</span></h1>
         <p id="authSubtitle" class="text-xs text-slate-500 mt-1">Sign in to continue</p>
       </div>
 
@@ -94,7 +96,7 @@
 
         <p id="authError" class="hidden text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></p>
 
-        <button id="authSubmit" type="submit" class="w-full bg-eblue hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg transition shadow-sm">
+        <button id="authSubmit" type="submit" class="w-full bg-gold hover:bg-goldDk text-navy font-semibold py-2.5 rounded-lg transition shadow-sm">
           Sign In
         </button>
       </form>
@@ -119,15 +121,15 @@
         <div class="w-11 h-11 flex items-center justify-center relative">
           <svg viewBox="0 0 100 100" class="w-11 h-11">
             <polygon points="50,4 91,27 91,73 50,96 9,73 9,27"
-                     fill="none" stroke="#3B82F6" stroke-width="6"/>
+                     fill="none" stroke="#C9A84C" stroke-width="6"/>
             <polygon points="50,22 75,36 75,64 50,78 25,64 25,36"
-                     fill="#3B82F6" opacity="0.18"/>
+                     fill="#C9A84C" opacity="0.18"/>
           </svg>
           <span class="absolute text-eblue font-black text-sm">NG</span>
         </div>
         <div>
-          <h1 class="text-lg sm:text-xl font-extrabold leading-tight">NXT-Gen <span class="text-eblue">Client Dashboard</span></h1>
-          <p class="text-[11px] text-slate-500 -mt-0.5">Digital Marketing Agency · Philippines</p>
+          <h1 class="text-lg sm:text-xl font-extrabold leading-tight">Franchise Brokerage <span class="text-eblue">PH</span></h1>
+          <p class="text-[11px] text-slate-500 -mt-0.5">Franchise Brokerage · Philippines</p>
         </div>
       </div>
       <nav class="flex flex-wrap gap-2 justify-end">
@@ -258,7 +260,7 @@
               <button id="exportCsv" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition flex items-center gap-1.5 shadow-sm">
                 📄 Export CSV
               </button>
-              <button id="downloadPdf" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center gap-1.5 shadow-sm">
+              <button id="downloadPdf" class="bg-gold hover:bg-goldDk text-navy font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center gap-1.5 shadow-sm">
                 ⬇️ Download as PDF
               </button>
             </div>
@@ -271,8 +273,8 @@
             <div class="flex items-center justify-between pb-4 border-b border-slate-200">
               <div class="flex items-center gap-3">
                 <svg viewBox="0 0 100 100" class="w-10 h-10">
-                  <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#3B82F6" stroke-width="6"/>
-                  <polygon points="50,22 75,36 75,64 50,78 25,64 25,36" fill="#3B82F6" opacity="0.25"/>
+                  <polygon points="50,4 91,27 91,73 50,96 9,73 9,27" fill="none" stroke="#C9A84C" stroke-width="6"/>
+                  <polygon points="50,22 75,36 75,64 50,78 25,64 25,36" fill="#C9A84C" opacity="0.25"/>
                 </svg>
                 <div>
                   <p class="text-eblue font-black text-sm tracking-wide">NXT-GEN HEX</p>
@@ -346,8 +348,8 @@
 
             <!-- recommendations + notes -->
             <div class="grid sm:grid-cols-2 gap-4 mt-4">
-              <div class="rounded-xl p-4 border" style="background:#eff6ff;border-color:#3B82F6;">
-                <p class="field-label" style="color:#2563EB;">📈 Recommendations · Next Month</p>
+              <div class="rounded-xl p-4 border" style="background:#fbf6e9;border-color:#C9A84C;">
+                <p class="field-label" style="color:#9A7B2E;">📈 Recommendations · Next Month</p>
                 <p id="p_recommend" class="text-sm text-slate-700 mt-1 whitespace-pre-wrap">—</p>
               </div>
               <div class="rounded-xl p-4 bg-slate-50 border border-slate-200">
@@ -375,7 +377,7 @@
           <button id="pipePdf" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition shadow-sm">📥 PDF</button>
           <button id="pipeCsv" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition shadow-sm">📊 Sheets (CSV)</button>
           <button id="pipeDoc" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition shadow-sm">📝 Docs</button>
-          <button id="addClientBtn" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm">
+          <button id="addClientBtn" class="bg-gold hover:bg-goldDk text-navy font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm">
             ➕ Add New Client
           </button>
         </div>
@@ -393,11 +395,11 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
           <h2 class="text-lg font-bold">🎨 Creative Production Board</h2>
-          <p class="text-sm text-slate-500">VSL · Image Ads · Video Ads — drag cards across stages. Boards auto-sync with your pipeline clients.</p>
+          <p class="text-sm text-slate-500">Tick off each creative as it's produced. Boards auto-sync with your pipeline clients.</p>
         </div>
         <a href="https://drive.google.com/drive/folders/132f_MVyuXkQrzpTxK-wAutIRely9UWpP?usp=sharing"
            target="_blank" rel="noopener"
-           class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm flex items-center gap-1.5">
+           class="bg-gold hover:bg-goldDk text-navy font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm flex items-center gap-1.5">
           ☁️ Upload Creatives to Drive
         </a>
       </div>
@@ -443,38 +445,7 @@
       </div>
       <div class="flex gap-3 mt-6">
         <button id="cancelClient" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-lg transition">Cancel</button>
-        <button id="saveClient" class="flex-1 bg-eblue hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">Save Client</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================== ADD CREATIVE MODAL ===================== -->
-  <div id="creativeModal" class="no-print hidden fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl">
-      <h3 class="text-lg font-bold mb-1">🎨 Add Creative</h3>
-      <p id="cr_clientname" class="text-xs text-slate-500 mb-4">—</p>
-      <input id="cr_clientid" type="hidden" />
-      <div class="space-y-4">
-        <div>
-          <label class="field-label">Creative Type</label>
-          <select id="cr_type" class="inp mt-1">
-            <option>VSL</option>
-            <option>Image Ads</option>
-            <option>Video Ads</option>
-          </select>
-        </div>
-        <div>
-          <label class="field-label">Title / Label</label>
-          <input id="cr_title" class="inp mt-1" placeholder="e.g. Hook A — Testimonial" />
-        </div>
-        <div>
-          <label class="field-label">Stage</label>
-          <select id="cr_status" class="inp mt-1"></select>
-        </div>
-      </div>
-      <div class="flex gap-3 mt-6">
-        <button id="cancelCreative" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-lg transition">Cancel</button>
-        <button id="saveCreative" class="flex-1 bg-eblue hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">Add Creative</button>
+        <button id="saveClient" class="flex-1 bg-gold hover:bg-goldDk text-navy font-semibold py-2 rounded-lg transition">Save Client</button>
       </div>
     </div>
   </div>
@@ -761,7 +732,7 @@
           datasets: [{
             label: 'Funnel',
             data: data,
-            backgroundColor: ['#1d4ed8','#3B82F6','#60A5FA','#93c5fd'],
+            backgroundColor: ['#8A6D22','#A9883A','#C9A84C','#E0C97A'],
             borderRadius: 6,
           }],
         },
@@ -1054,7 +1025,7 @@
         const current = client.phase === i;
         let cls = 'bg-slate-200';
         if (done) cls = 'bg-green-500';
-        else if (current) cls = 'bg-eblue';
+        else if (current) cls = 'bg-gold';
         return `<div class="flex-1 h-2.5 rounded-full ${cls}" title="Phase ${i+1}: ${p.name}${done ? ' ✓' : ''}"></div>`;
       }).join('');
 
@@ -1204,7 +1175,7 @@
   $('pipeDoc').addEventListener('click', () => {
     if (!clients.length) { alert('No clients to export yet.'); return; }
     const esc = (s) => (s ?? '').toString().replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
-    let body = `<h1 style="color:#2563EB;font-family:Arial">NXT-Gen Hex — Client Pipeline</h1>
+    let body = `<h1 style="color:#9A7B2E;font-family:Arial">Franchise Brokerage PH — Client Pipeline</h1>
       <p style="font-family:Arial;color:#555">Generated ${new Date().toLocaleDateString('en-PH')} · ${clients.length} client(s)</p>`;
     clients.forEach(c => {
       const completed = PHASES.filter((p, i) => phaseComplete(c, i)).length;
@@ -1213,10 +1184,10 @@
           Contact: ${esc(c.contact || '—')} &nbsp;|&nbsp; Date Added: ${esc(c.date || '—')} &nbsp;|&nbsp;
           Current: Phase ${c.phase + 1} — ${esc(PHASES[c.phase].name)} &nbsp;|&nbsp; Progress: ${completed}/11</p>
         <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;font-family:Arial;font-size:12px;width:100%">
-          <tr style="background:#eff6ff"><th align="left">Phase</th><th align="left">Status</th></tr>`;
+          <tr style="background:#fbf6e9"><th align="left">Phase</th><th align="left">Status</th></tr>`;
       PHASES.forEach((p, i) => {
         const st = phaseStatusLabel(c, i);
-        const color = st === 'Done' ? '#16a34a' : st === 'In Progress' ? '#2563EB' : '#94a3b8';
+        const color = st === 'Done' ? '#16a34a' : st === 'In Progress' ? '#9A7B2E' : '#94a3b8';
         body += `<tr><td>Phase ${i + 1}: ${esc(p.name)}</td><td style="color:${color};font-weight:bold">${st}</td></tr>`;
       });
       body += `</table><br/>`;
@@ -1230,21 +1201,11 @@
   // ============================================================
   //  SECTION 3 — CREATIVE PRODUCTION BOARD
   // ============================================================
-  const CREATIVE_TYPES = ['VSL', 'Image Ads', 'Video Ads'];
-  const CREATIVE_STAGES = ['Backlog', 'For Revision', 'Uploaded', 'Running'];
-  const TYPE_BADGE = {
-    'VSL':       'bg-purple-100 text-purple-700',
-    'Image Ads': 'bg-blue-100 text-blue-700',
-    'Video Ads': 'bg-green-100 text-green-700',
-  };
-  const STAGE_STYLE = {
-    'Backlog':      { dot: 'bg-slate-400',  head: 'text-slate-600' },
-    'For Revision': { dot: 'bg-amber-400',  head: 'text-amber-600' },
-    'Uploaded':     { dot: 'bg-blue-400',   head: 'text-blue-600' },
-    'Running':      { dot: 'bg-green-500',  head: 'text-green-600' },
-  };
+  // creative deliverables tracked per client as a simple checklist
+  const CREATIVE_TYPES = ['VSL', 'Image Ads', 'Video Ads', 'Ty Page Video'];
+  const DRIVE_LINK = 'https://drive.google.com/drive/folders/132f_MVyuXkQrzpTxK-wAutIRely9UWpP?usp=sharing';
 
-  let creatives = {};  // { [clientId]: { checklist:{VSL,Image Ads,Video Ads}, cards:[{id,type,title,status}] } }
+  let creatives = {};  // { [clientId]: { checklist: { type: bool } } }
 
   function loadCreatives() {
     const raw = localStorage.getItem('nxtgen_creatives');
@@ -1254,15 +1215,18 @@
     localStorage.setItem('nxtgen_creatives', JSON.stringify(creatives));
   }
 
-  // ensure every pipeline client has a board; drop boards for removed clients
+  // ensure every pipeline client has a checklist (with all types); drop removed clients
   function syncCreatives() {
     let changed = false;
     const ids = new Set(clients.map(c => String(c.id)));
     clients.forEach(c => {
-      if (!creatives[c.id]) {
-        creatives[c.id] = { checklist: { 'VSL': false, 'Image Ads': false, 'Video Ads': false }, cards: [] };
+      if (!creatives[c.id] || !creatives[c.id].checklist) {
+        creatives[c.id] = { checklist: {} };
         changed = true;
       }
+      CREATIVE_TYPES.forEach(t => {
+        if (creatives[c.id].checklist[t] === undefined) { creatives[c.id].checklist[t] = false; changed = true; }
+      });
     });
     Object.keys(creatives).forEach(id => { if (!ids.has(id)) { delete creatives[id]; changed = true; } });
     if (changed) saveCreatives();
@@ -1276,72 +1240,44 @@
 
     clients.forEach(client => {
       const board = creatives[client.id];
-      const cards = board.cards;
+      const total = CREATIVE_TYPES.length;
+      const done = CREATIVE_TYPES.filter(t => board.checklist[t]).length;
+      const pct = Math.round((done / total) * 100);
+      const allDone = done === total;
 
-      // summary counts by stage
-      const count = (st) => cards.filter(c => c.status === st).length;
-      const summary = `
-        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span>For Revision: <b>${count('For Revision')}</b></span>
-        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-400"></span>Uploaded: <b>${count('Uploaded')}</b></span>
-        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span>Running: <b>${count('Running')}</b></span>`;
-
-      // "created" checklist
-      const checklist = CREATIVE_TYPES.map(t => `
-        <label class="flex items-center gap-1.5 text-xs cursor-pointer">
+      // checklist items
+      const items = CREATIVE_TYPES.map(t => `
+        <label class="flex items-center gap-2.5 py-1.5 cursor-pointer">
           <input type="checkbox" data-crcheck="${client.id}" data-crtype="${t}" ${board.checklist[t] ? 'checked' : ''}
-            class="w-4 h-4 accent-eblue rounded" />
-          <span class="${board.checklist[t] ? 'line-through text-slate-400' : 'text-slate-600'} font-medium">${t} created</span>
+            class="w-5 h-5 accent-gold rounded" />
+          <span class="text-sm ${board.checklist[t] ? 'line-through text-slate-400' : 'text-slate-700'} font-medium">${t}</span>
         </label>`).join('');
-
-      // kanban columns
-      const columns = CREATIVE_STAGES.map(stage => {
-        const colCards = cards.filter(c => c.status === stage);
-        const cardsHtml = colCards.map(card => `
-          <div draggable="true" data-cardid="${card.id}" data-clientid="${client.id}"
-               class="cr-card bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm cursor-grab active:cursor-grabbing">
-            <div class="flex items-start justify-between gap-2">
-              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${TYPE_BADGE[card.type] || 'bg-slate-100 text-slate-600'}">${card.type}</span>
-              <button data-delcard="${card.id}" data-clientid="${client.id}" class="cr-del text-slate-300 hover:text-red-500 text-xs leading-none">✕</button>
-            </div>
-            <p class="text-sm text-slate-800 mt-1.5 break-words">${card.title}</p>
-          </div>`).join('') || `<p class="text-xs text-slate-300 italic text-center py-3">Drop here</p>`;
-
-        const s = STAGE_STYLE[stage];
-        return `
-          <div class="cr-col flex-1 min-w-[180px] bg-slate-50 border border-slate-200 rounded-xl p-3"
-               data-stage="${stage}" data-clientid="${client.id}">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold flex items-center gap-1.5 ${s.head}"><span class="w-2 h-2 rounded-full ${s.dot}"></span>${stage}</span>
-              <span class="text-[10px] text-slate-400 font-semibold">${colCards.length}</span>
-            </div>
-            <div class="cr-dropzone space-y-2 min-h-[40px]">${cardsHtml}</div>
-          </div>`;
-      }).join('');
 
       const card = document.createElement('div');
       card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm p-5';
       card.innerHTML = `
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 class="text-base font-bold text-slate-900">${client.name}</h3>
-            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-1">${summary}</div>
+            <p class="text-xs text-slate-500">${client.contact ? '👤 ' + client.contact + ' · ' : ''}🎬 ${done}/${total} creatives done</p>
           </div>
-          <div class="flex flex-wrap items-center gap-3">
-            <div class="flex flex-wrap gap-x-3 gap-y-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">${checklist}</div>
-            <button data-addcreative="${client.id}" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-3 py-2 rounded-lg text-xs transition shadow-sm">➕ Add Creative</button>
-            <a href="https://drive.google.com/drive/folders/132f_MVyuXkQrzpTxK-wAutIRely9UWpP?usp=sharing" target="_blank" rel="noopener"
-               class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-xs transition shadow-sm">☁️ Upload</a>
+          <a href="${DRIVE_LINK}" target="_blank" rel="noopener"
+             class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-xs transition shadow-sm self-start sm:self-auto">☁️ Upload to Drive</a>
+        </div>
+
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="field-label">Creative Progress</span>
+            <span class="text-xs font-semibold ${allDone ? 'text-green-600' : 'text-slate-500'}">${allDone ? '✓ All creatives done' : pct + '%'}</span>
+          </div>
+          <div class="h-2.5 w-full rounded-full bg-slate-200 overflow-hidden">
+            <div class="h-full rounded-full transition-all ${allDone ? 'bg-green-500' : 'bg-gold'}" style="width:${pct}%"></div>
           </div>
         </div>
-        <div class="flex gap-3 overflow-x-auto pb-1">${columns}</div>`;
+
+        <div class="mt-3 grid sm:grid-cols-2 gap-x-6">${items}</div>`;
       wrap.appendChild(card);
     });
-
-    wireCreativeEvents();
-  }
-
-  function wireCreativeEvents() {
-    const wrap = $('creativeBoards');
 
     // checklist toggles
     wrap.querySelectorAll('[data-crcheck]').forEach(chk => {
@@ -1350,72 +1286,7 @@
         saveCreatives(); renderCreatives();
       });
     });
-
-    // add creative
-    wrap.querySelectorAll('[data-addcreative]').forEach(btn => {
-      btn.addEventListener('click', () => openCreativeModal(btn.dataset.addcreative));
-    });
-
-    // delete card
-    wrap.querySelectorAll('.cr-del').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const cid = btn.dataset.clientid, cardId = Number(btn.dataset.delcard);
-        creatives[cid].cards = creatives[cid].cards.filter(c => c.id !== cardId);
-        saveCreatives(); renderCreatives();
-      });
-    });
-
-    // drag and drop
-    wrap.querySelectorAll('.cr-card').forEach(card => {
-      card.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', JSON.stringify({ clientId: card.dataset.clientid, cardId: card.dataset.cardid }));
-        card.classList.add('opacity-50');
-      });
-      card.addEventListener('dragend', () => card.classList.remove('opacity-50'));
-    });
-    wrap.querySelectorAll('.cr-col').forEach(col => {
-      col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('ring-2', 'ring-eblue'); });
-      col.addEventListener('dragleave', () => col.classList.remove('ring-2', 'ring-eblue'));
-      col.addEventListener('drop', (e) => {
-        e.preventDefault();
-        col.classList.remove('ring-2', 'ring-eblue');
-        let payload;
-        try { payload = JSON.parse(e.dataTransfer.getData('text/plain')); } catch (_) { return; }
-        // only allow moving within the same client's board
-        if (payload.clientId !== col.dataset.clientid) return;
-        const cardObj = creatives[payload.clientId].cards.find(c => c.id === Number(payload.cardId));
-        if (cardObj) { cardObj.status = col.dataset.stage; saveCreatives(); renderCreatives(); }
-      });
-    });
   }
-
-  // ---------- creative modal ----------
-  const creativeModal = $('creativeModal');
-  CREATIVE_STAGES.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; $('cr_status').appendChild(o); });
-
-  function openCreativeModal(clientId) {
-    const client = clients.find(c => String(c.id) === String(clientId));
-    $('cr_clientid').value = clientId;
-    $('cr_clientname').textContent = client ? 'For: ' + client.name : '';
-    $('cr_type').value = 'VSL';
-    $('cr_title').value = '';
-    $('cr_status').value = 'Backlog';
-    creativeModal.classList.remove('hidden');
-  }
-  $('cancelCreative').addEventListener('click', () => creativeModal.classList.add('hidden'));
-  creativeModal.addEventListener('click', (e) => { if (e.target === creativeModal) creativeModal.classList.add('hidden'); });
-
-  $('saveCreative').addEventListener('click', () => {
-    const cid = $('cr_clientid').value;
-    const title = $('cr_title').value.trim();
-    if (!title) { alert('Please enter a title for the creative.'); return; }
-    if (!creatives[cid]) return;
-    creatives[cid].cards.push({ id: Date.now(), type: $('cr_type').value, title, status: $('cr_status').value });
-    saveCreatives();
-    creativeModal.classList.add('hidden');
-    renderCreatives();
-  });
 
   // ============================================================
   //  INIT
