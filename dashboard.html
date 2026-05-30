@@ -130,12 +130,15 @@
           <p class="text-[11px] text-slate-500 -mt-0.5">Digital Marketing Agency · Philippines</p>
         </div>
       </div>
-      <nav class="flex gap-2">
+      <nav class="flex flex-wrap gap-2 justify-end">
         <button data-tab="report" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 transition">
           📊 <span class="hidden sm:inline">Report Generator</span><span class="sm:hidden">Report</span>
         </button>
         <button data-tab="pipeline" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 transition">
           🚀 <span class="hidden sm:inline">Pipeline Tracker</span><span class="sm:hidden">Pipeline</span>
+        </button>
+        <button data-tab="creatives" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-600 transition">
+          🎨 <span class="hidden sm:inline">Creative Board</span><span class="sm:hidden">Creatives</span>
         </button>
         <div class="w-px bg-slate-200 mx-1 hidden sm:block"></div>
         <span id="authWho" class="hidden sm:flex items-center text-xs text-slate-500 font-medium px-1"></span>
@@ -368,15 +371,41 @@
           <h2 class="text-lg font-bold">🚀 Client Pipeline Tracker</h2>
           <p class="text-sm text-slate-500">FBPH sales process · 11 phases · <span id="clientCount">0</span> client(s)</p>
         </div>
-        <button id="addClientBtn" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm">
-          ➕ Add New Client
-        </button>
+        <div class="flex flex-wrap gap-2">
+          <button id="pipePdf" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition shadow-sm">📥 PDF</button>
+          <button id="pipeCsv" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition shadow-sm">📊 Sheets (CSV)</button>
+          <button id="pipeDoc" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-sm transition shadow-sm">📝 Docs</button>
+          <button id="addClientBtn" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm">
+            ➕ Add New Client
+          </button>
+        </div>
       </div>
 
       <div id="clientList" class="space-y-4"></div>
       <div id="emptyState" class="text-center py-16 text-slate-400">
         <p class="text-5xl mb-3">📭</p>
         <p>No clients yet. Click <span class="text-eblue font-semibold">"Add New Client"</span> to begin.</p>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 3: CREATIVE BOARD ===================== -->
+    <section id="tab-creatives" class="hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h2 class="text-lg font-bold">🎨 Creative Production Board</h2>
+          <p class="text-sm text-slate-500">VSL · Image Ads · Video Ads — drag cards across stages. Boards auto-sync with your pipeline clients.</p>
+        </div>
+        <a href="https://drive.google.com/drive/folders/132f_MVyuXkQrzpTxK-wAutIRely9UWpP?usp=sharing"
+           target="_blank" rel="noopener"
+           class="bg-eblue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-sm flex items-center gap-1.5">
+          ☁️ Upload Creatives to Drive
+        </a>
+      </div>
+
+      <div id="creativeBoards" class="space-y-6"></div>
+      <div id="creativeEmpty" class="text-center py-16 text-slate-400">
+        <p class="text-5xl mb-3">🎬</p>
+        <p>No clients yet. Add a client in the <span class="text-eblue font-semibold">Pipeline Tracker</span> and a creative board will appear here automatically.</p>
       </div>
     </section>
   </main>
@@ -415,6 +444,37 @@
       <div class="flex gap-3 mt-6">
         <button id="cancelClient" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-lg transition">Cancel</button>
         <button id="saveClient" class="flex-1 bg-eblue hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">Save Client</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ADD CREATIVE MODAL ===================== -->
+  <div id="creativeModal" class="no-print hidden fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl">
+      <h3 class="text-lg font-bold mb-1">🎨 Add Creative</h3>
+      <p id="cr_clientname" class="text-xs text-slate-500 mb-4">—</p>
+      <input id="cr_clientid" type="hidden" />
+      <div class="space-y-4">
+        <div>
+          <label class="field-label">Creative Type</label>
+          <select id="cr_type" class="inp mt-1">
+            <option>VSL</option>
+            <option>Image Ads</option>
+            <option>Video Ads</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Title / Label</label>
+          <input id="cr_title" class="inp mt-1" placeholder="e.g. Hook A — Testimonial" />
+        </div>
+        <div>
+          <label class="field-label">Stage</label>
+          <select id="cr_status" class="inp mt-1"></select>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button id="cancelCreative" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-lg transition">Cancel</button>
+        <button id="saveCreative" class="flex-1 bg-eblue hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">Add Creative</button>
       </div>
     </div>
   </div>
@@ -587,6 +647,8 @@
       const tab = btn.dataset.tab;
       $('tab-report').classList.toggle('hidden', tab !== 'report');
       $('tab-pipeline').classList.toggle('hidden', tab !== 'pipeline');
+      $('tab-creatives').classList.toggle('hidden', tab !== 'creatives');
+      if (tab === 'creatives') renderCreatives();
     });
   });
 
@@ -1067,13 +1129,293 @@
     });
     list.querySelectorAll('.del-client').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (confirm('Delete this client?')) {
+        if (confirm('Delete this client? This also removes their creative board.')) {
           clients = clients.filter(x => x.id !== Number(btn.dataset.del));
           saveClients(); renderClients();
         }
       });
     });
+
+    // keep the creative board in sync with the pipeline clients
+    syncCreatives();
+    renderCreatives();
   }
+
+  // ============================================================
+  //  PIPELINE EXPORT — PDF / CSV (Sheets) / DOC (Docs)
+  // ============================================================
+  function downloadBlob(content, mime, filename) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function phaseStatusLabel(client, i) {
+    if (phaseComplete(client, i)) return 'Done';
+    if (client.phase === i) return 'In Progress';
+    return 'Pending';
+  }
+
+  // PDF — snapshot of the client cards
+  $('pipePdf').addEventListener('click', async () => {
+    if (!clients.length) { alert('No clients to export yet.'); return; }
+    const btn = $('pipePdf'); const orig = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '⏳';
+    try {
+      const el = $('clientList');
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      const img = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgW = pageW;
+      const imgH = (canvas.height * imgW) / canvas.width;
+      let heightLeft = imgH, position = 0;
+      pdf.addImage(img, 'PNG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+      while (heightLeft > 0) { position -= pageH; pdf.addPage(); pdf.addImage(img, 'PNG', 0, position, imgW, imgH); heightLeft -= pageH; }
+      pdf.save('client-pipeline.pdf');
+    } catch (e) { alert('PDF export failed: ' + e.message); }
+    finally { btn.disabled = false; btn.innerHTML = orig; }
+  });
+
+  // CSV — opens directly in Google Sheets / Excel
+  $('pipeCsv').addEventListener('click', () => {
+    if (!clients.length) { alert('No clients to export yet.'); return; }
+    const header = ['Client', 'Contact', 'Date Added', 'Current Phase', 'Phases Completed', ...PHASES.map((p, i) => `P${i+1}. ${p.name}`)];
+    const rows = [header];
+    clients.forEach(c => {
+      const completed = PHASES.filter((p, i) => phaseComplete(c, i)).length;
+      rows.push([
+        c.name, c.contact || '', c.date || '',
+        `Phase ${c.phase + 1}: ${PHASES[c.phase].name}`,
+        `${completed}/11`,
+        ...PHASES.map((p, i) => phaseStatusLabel(c, i)),
+      ]);
+    });
+    const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+    downloadBlob('﻿' + csv, 'text/csv;charset=utf-8;', 'client-pipeline.csv');
+  });
+
+  // DOC — Word/Google-Docs-compatible HTML document
+  $('pipeDoc').addEventListener('click', () => {
+    if (!clients.length) { alert('No clients to export yet.'); return; }
+    const esc = (s) => (s ?? '').toString().replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
+    let body = `<h1 style="color:#2563EB;font-family:Arial">NXT-Gen Hex — Client Pipeline</h1>
+      <p style="font-family:Arial;color:#555">Generated ${new Date().toLocaleDateString('en-PH')} · ${clients.length} client(s)</p>`;
+    clients.forEach(c => {
+      const completed = PHASES.filter((p, i) => phaseComplete(c, i)).length;
+      body += `<h2 style="font-family:Arial;color:#0f172a">${esc(c.name)}</h2>
+        <p style="font-family:Arial;font-size:12px;color:#555">
+          Contact: ${esc(c.contact || '—')} &nbsp;|&nbsp; Date Added: ${esc(c.date || '—')} &nbsp;|&nbsp;
+          Current: Phase ${c.phase + 1} — ${esc(PHASES[c.phase].name)} &nbsp;|&nbsp; Progress: ${completed}/11</p>
+        <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;font-family:Arial;font-size:12px;width:100%">
+          <tr style="background:#eff6ff"><th align="left">Phase</th><th align="left">Status</th></tr>`;
+      PHASES.forEach((p, i) => {
+        const st = phaseStatusLabel(c, i);
+        const color = st === 'Done' ? '#16a34a' : st === 'In Progress' ? '#2563EB' : '#94a3b8';
+        body += `<tr><td>Phase ${i + 1}: ${esc(p.name)}</td><td style="color:${color};font-weight:bold">${st}</td></tr>`;
+      });
+      body += `</table><br/>`;
+    });
+    const html = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>Client Pipeline</title></head><body>${body}</body></html>`;
+    downloadBlob('﻿' + html, 'application/msword', 'client-pipeline.doc');
+  });
+
+  // ============================================================
+  //  SECTION 3 — CREATIVE PRODUCTION BOARD
+  // ============================================================
+  const CREATIVE_TYPES = ['VSL', 'Image Ads', 'Video Ads'];
+  const CREATIVE_STAGES = ['Backlog', 'For Revision', 'Uploaded', 'Running'];
+  const TYPE_BADGE = {
+    'VSL':       'bg-purple-100 text-purple-700',
+    'Image Ads': 'bg-blue-100 text-blue-700',
+    'Video Ads': 'bg-green-100 text-green-700',
+  };
+  const STAGE_STYLE = {
+    'Backlog':      { dot: 'bg-slate-400',  head: 'text-slate-600' },
+    'For Revision': { dot: 'bg-amber-400',  head: 'text-amber-600' },
+    'Uploaded':     { dot: 'bg-blue-400',   head: 'text-blue-600' },
+    'Running':      { dot: 'bg-green-500',  head: 'text-green-600' },
+  };
+
+  let creatives = {};  // { [clientId]: { checklist:{VSL,Image Ads,Video Ads}, cards:[{id,type,title,status}] } }
+
+  function loadCreatives() {
+    const raw = localStorage.getItem('nxtgen_creatives');
+    creatives = raw ? JSON.parse(raw) : {};
+  }
+  function saveCreatives() {
+    localStorage.setItem('nxtgen_creatives', JSON.stringify(creatives));
+  }
+
+  // ensure every pipeline client has a board; drop boards for removed clients
+  function syncCreatives() {
+    let changed = false;
+    const ids = new Set(clients.map(c => String(c.id)));
+    clients.forEach(c => {
+      if (!creatives[c.id]) {
+        creatives[c.id] = { checklist: { 'VSL': false, 'Image Ads': false, 'Video Ads': false }, cards: [] };
+        changed = true;
+      }
+    });
+    Object.keys(creatives).forEach(id => { if (!ids.has(id)) { delete creatives[id]; changed = true; } });
+    if (changed) saveCreatives();
+  }
+
+  function renderCreatives() {
+    const wrap = $('creativeBoards');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    $('creativeEmpty').classList.toggle('hidden', clients.length > 0);
+
+    clients.forEach(client => {
+      const board = creatives[client.id];
+      const cards = board.cards;
+
+      // summary counts by stage
+      const count = (st) => cards.filter(c => c.status === st).length;
+      const summary = `
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span>For Revision: <b>${count('For Revision')}</b></span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-400"></span>Uploaded: <b>${count('Uploaded')}</b></span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span>Running: <b>${count('Running')}</b></span>`;
+
+      // "created" checklist
+      const checklist = CREATIVE_TYPES.map(t => `
+        <label class="flex items-center gap-1.5 text-xs cursor-pointer">
+          <input type="checkbox" data-crcheck="${client.id}" data-crtype="${t}" ${board.checklist[t] ? 'checked' : ''}
+            class="w-4 h-4 accent-eblue rounded" />
+          <span class="${board.checklist[t] ? 'line-through text-slate-400' : 'text-slate-600'} font-medium">${t} created</span>
+        </label>`).join('');
+
+      // kanban columns
+      const columns = CREATIVE_STAGES.map(stage => {
+        const colCards = cards.filter(c => c.status === stage);
+        const cardsHtml = colCards.map(card => `
+          <div draggable="true" data-cardid="${card.id}" data-clientid="${client.id}"
+               class="cr-card bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm cursor-grab active:cursor-grabbing">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${TYPE_BADGE[card.type] || 'bg-slate-100 text-slate-600'}">${card.type}</span>
+              <button data-delcard="${card.id}" data-clientid="${client.id}" class="cr-del text-slate-300 hover:text-red-500 text-xs leading-none">✕</button>
+            </div>
+            <p class="text-sm text-slate-800 mt-1.5 break-words">${card.title}</p>
+          </div>`).join('') || `<p class="text-xs text-slate-300 italic text-center py-3">Drop here</p>`;
+
+        const s = STAGE_STYLE[stage];
+        return `
+          <div class="cr-col flex-1 min-w-[180px] bg-slate-50 border border-slate-200 rounded-xl p-3"
+               data-stage="${stage}" data-clientid="${client.id}">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold flex items-center gap-1.5 ${s.head}"><span class="w-2 h-2 rounded-full ${s.dot}"></span>${stage}</span>
+              <span class="text-[10px] text-slate-400 font-semibold">${colCards.length}</span>
+            </div>
+            <div class="cr-dropzone space-y-2 min-h-[40px]">${cardsHtml}</div>
+          </div>`;
+      }).join('');
+
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm p-5';
+      card.innerHTML = `
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">${client.name}</h3>
+            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-1">${summary}</div>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-wrap gap-x-3 gap-y-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">${checklist}</div>
+            <button data-addcreative="${client.id}" class="bg-eblue hover:bg-blue-600 text-white font-semibold px-3 py-2 rounded-lg text-xs transition shadow-sm">➕ Add Creative</button>
+            <a href="https://drive.google.com/drive/folders/132f_MVyuXkQrzpTxK-wAutIRely9UWpP?usp=sharing" target="_blank" rel="noopener"
+               class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg text-xs transition shadow-sm">☁️ Upload</a>
+          </div>
+        </div>
+        <div class="flex gap-3 overflow-x-auto pb-1">${columns}</div>`;
+      wrap.appendChild(card);
+    });
+
+    wireCreativeEvents();
+  }
+
+  function wireCreativeEvents() {
+    const wrap = $('creativeBoards');
+
+    // checklist toggles
+    wrap.querySelectorAll('[data-crcheck]').forEach(chk => {
+      chk.addEventListener('change', () => {
+        creatives[chk.dataset.crcheck].checklist[chk.dataset.crtype] = chk.checked;
+        saveCreatives(); renderCreatives();
+      });
+    });
+
+    // add creative
+    wrap.querySelectorAll('[data-addcreative]').forEach(btn => {
+      btn.addEventListener('click', () => openCreativeModal(btn.dataset.addcreative));
+    });
+
+    // delete card
+    wrap.querySelectorAll('.cr-del').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cid = btn.dataset.clientid, cardId = Number(btn.dataset.delcard);
+        creatives[cid].cards = creatives[cid].cards.filter(c => c.id !== cardId);
+        saveCreatives(); renderCreatives();
+      });
+    });
+
+    // drag and drop
+    wrap.querySelectorAll('.cr-card').forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({ clientId: card.dataset.clientid, cardId: card.dataset.cardid }));
+        card.classList.add('opacity-50');
+      });
+      card.addEventListener('dragend', () => card.classList.remove('opacity-50'));
+    });
+    wrap.querySelectorAll('.cr-col').forEach(col => {
+      col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('ring-2', 'ring-eblue'); });
+      col.addEventListener('dragleave', () => col.classList.remove('ring-2', 'ring-eblue'));
+      col.addEventListener('drop', (e) => {
+        e.preventDefault();
+        col.classList.remove('ring-2', 'ring-eblue');
+        let payload;
+        try { payload = JSON.parse(e.dataTransfer.getData('text/plain')); } catch (_) { return; }
+        // only allow moving within the same client's board
+        if (payload.clientId !== col.dataset.clientid) return;
+        const cardObj = creatives[payload.clientId].cards.find(c => c.id === Number(payload.cardId));
+        if (cardObj) { cardObj.status = col.dataset.stage; saveCreatives(); renderCreatives(); }
+      });
+    });
+  }
+
+  // ---------- creative modal ----------
+  const creativeModal = $('creativeModal');
+  CREATIVE_STAGES.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; $('cr_status').appendChild(o); });
+
+  function openCreativeModal(clientId) {
+    const client = clients.find(c => String(c.id) === String(clientId));
+    $('cr_clientid').value = clientId;
+    $('cr_clientname').textContent = client ? 'For: ' + client.name : '';
+    $('cr_type').value = 'VSL';
+    $('cr_title').value = '';
+    $('cr_status').value = 'Backlog';
+    creativeModal.classList.remove('hidden');
+  }
+  $('cancelCreative').addEventListener('click', () => creativeModal.classList.add('hidden'));
+  creativeModal.addEventListener('click', (e) => { if (e.target === creativeModal) creativeModal.classList.add('hidden'); });
+
+  $('saveCreative').addEventListener('click', () => {
+    const cid = $('cr_clientid').value;
+    const title = $('cr_title').value.trim();
+    if (!title) { alert('Please enter a title for the creative.'); return; }
+    if (!creatives[cid]) return;
+    creatives[cid].cards.push({ id: Date.now(), type: $('cr_type').value, title, status: $('cr_status').value });
+    saveCreatives();
+    creativeModal.classList.add('hidden');
+    renderCreatives();
+  });
 
   // ============================================================
   //  INIT
@@ -1082,6 +1424,7 @@
   loadReport();
   renderReport();
   loadClients();
+  loadCreatives();
   renderClients();
   </script>
 </body>
